@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SCENE-IN (씬인) - 영화·드라마 장면 중심 팬덤 플랫폼</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      /* Palette B: Minimal & Modern */
+      --bg: #FFFDFC;                   /* Warm Off-White Canvas */
+      --bg-subtle: #F8F6F1;
+      --surface: #FFFFFF;              /* Clean White Card Surface */
+      --surface-high: #F0ECE5;         /* Warm Stone Secondary Surface */
+      --surface-elevated: #E5DFD5;
+      --border: #E3DDD4;
+      --border-light: #ECE7DF;
+      --accent: #E98B26;               /* Vivid Warm Amber Orange Accent */
+      --accent-hover: #D47A1A;
+      --accent-subtle: rgba(233, 139, 38, 0.12);
+      --secondary: #33302C;            /* Deep Warm Charcoal */
+      --text-primary: #33302C;         /* High Readability Deep Charcoal */
+      --text-secondary: #6E675F;
+      --text-muted: #999083;
+      --text-disabled: #BCB4A7;
+      --text-inverse: #FFFDFC;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --radius-card: 16px;
+      --radius-btn: 12px;
+      --radius-chip: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* Outer Shell: Auto-Responsive without device bezels or toolbars */
+    .app-root {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+    }
+
+    /* Container for Laptop/Desktop: auto-centers with max-width */
+    .main-wrapper {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 76px; /* Space for bottom tab navigation */
+    }
+
+    /* App Header */
+    .app-header {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(255, 253, 252, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--text-inverse);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 2px 10px rgba(233, 139, 38, 0.35);
+    }
+    .header-text .title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header-text .subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    .tab-panel.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Buttons, Chips, Cards */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      min-height: 44px;
+    }
+    .btn:active {
+      transform: scale(0.98);
+      opacity: 0.85;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(233, 139, 38, 0.35);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    .btn-secondary {
+      background: var(--surface-high);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-light);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(51, 48, 44, 0.04);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .chip-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .chip-scroll::-webkit-scrollbar { display: none; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-chip);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 36px;
+      transition: all 0.2s;
+    }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(233, 139, 38, 0.3);
+    }
+
+    /* 2-Column Responsive Layout */
+    .responsive-split-view {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+    @media (min-width: 768px) {
+      .responsive-split-view {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        gap: 24px;
+      }
+    }
+    @media (min-width: 1024px) {
+      .responsive-split-view {
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 28px;
+      }
+    }
+
+    /* Cards Grid */
+    .cards-responsive-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px 20px;
+    }
+    @media (min-width: 640px) {
+      .cards-responsive-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1024px) {
+      .cards-responsive-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Map Flex Layout */
+    .map-flex-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    @media (min-width: 860px) {
+      .map-flex-container {
+        flex-direction: row;
+        height: calc(100vh - 140px);
+        min-height: 600px;
+      }
+    }
+
+    .map-canvas {
+      flex: 1.4;
+      background: #1A1816; /* Clean Dark Radar Map background */
+      position: relative;
+      min-height: 400px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: 
+        radial-gradient(#33302C 1px, transparent 1px),
+        radial-gradient(#292623 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+    .radar-ring {
+      position: absolute;
+      border: 1px dashed rgba(233, 139, 38, 0.25);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .pin-marker {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 20;
+      transition: transform 0.2s;
+    }
+    .pin-marker:hover, .pin-marker.active {
+      transform: translate(-50%, -110%) scale(1.1);
+      z-index: 30;
+    }
+    .pin-bubble {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px 19px 19px 4px;
+      transform: rotate(-45deg);
+      background: var(--surface-high);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(233, 139, 38, 0.4);
+    }
+    .pin-bubble i {
+      transform: rotate(45deg);
+      color: var(--accent);
+      font-size: 15px;
+    }
+    .pin-marker.active .pin-bubble {
+      background: var(--accent);
+      border-color: #FDBA74;
+    }
+    .pin-marker.active .pin-bubble i {
+      color: var(--text-inverse);
+    }
+    .pin-label {
+      background: rgba(255, 253, 252, 0.95);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 6px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .map-sidebar {
+      flex: 1;
+      max-width: 460px;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* Registered spots bar */
+    .registered-spots-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .registered-spot-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .registered-spot-item:last-child {
+      border-bottom: none;
+    }
+
+    /* TAB 2: Calendar Grid */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .cal-day-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 6px 0;
+    }
+    .cal-cell {
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--surface-high);
+      cursor: pointer;
+      position: relative;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .cal-cell:hover {
+      border-color: var(--accent);
+    }
+    .cal-cell.selected {
+      background: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 700;
+      border-color: var(--accent);
+      box-shadow: 0 2px 10px rgba(233, 139, 38, 0.35);
+    }
+    .cal-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--accent);
+      position: absolute;
+      bottom: 4px;
+    }
+    .cal-cell.selected .cal-dot {
+      background: var(--text-inverse);
+    }
+
+    /* Anonymous Notice Banner & Badge for Explore */
+    .anon-banner {
+      background: var(--surface-high);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 12px 16px;
+      margin: 12px 20px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 18px;
+    }
+    .anon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: var(--radius-chip);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Section Segment Toggle Bar (Drawer: My vs Scraped) */
+    .section-segment-toggle {
+      display: flex;
+      background: var(--surface-high);
+      border-radius: var(--radius-btn);
+      padding: 4px;
+      gap: 4px;
+      margin: 12px 20px 14px;
+      border: 1px solid var(--border);
+    }
+    .section-segment-btn {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: calc(var(--radius-btn) - 2px);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .section-segment-btn.active {
+      background: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(233, 139, 38, 0.3);
+    }
+
+    /* Privacy Toggle (Public vs Private) */
+    .privacy-toggle-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .privacy-toggle-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius-btn);
+      background: var(--surface-high);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .privacy-toggle-btn.active {
+      background: rgba(233, 139, 38, 0.14);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Bottom Navigation Tab Bar (Fixed) */
+    .tab-bar-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: rgba(255, 253, 252, 0.96);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      z-index: 200;
+      box-shadow: 0 -2px 10px rgba(51, 48, 44, 0.04);
+    }
+    .tab-bar-inner {
+      width: 100%;
+      max-width: 680px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding-bottom: 6px;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+      gap: 3px;
+      user-select: none;
+      transition: color 0.15s;
+    }
+    .tab-item.active {
+      color: var(--accent);
+    }
+    .tab-item i {
+      font-size: 18px;
+    }
+
+    /* Center Prominent Home / Explore Tab Button */
+    .tab-item.center-map {
+      position: relative;
+      top: -12px;
+    }
+    .tab-item.center-map .center-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 26px;
+      background: var(--surface-high);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(233, 139, 38, 0.25);
+      transition: all 0.2s;
+    }
+    .tab-item.center-map.active .center-btn {
+      background: var(--accent);
+      border-color: #FDBA74;
+      box-shadow: 0 6px 20px rgba(233, 139, 38, 0.45);
+    }
+    .tab-item.center-map .center-btn i {
+      color: var(--accent);
+      font-size: 22px;
+    }
+    .tab-item.center-map.active .center-btn i {
+      color: var(--text-inverse);
+    }
+
+    /* Modals & Overlays */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(51, 48, 44, 0.65);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 300;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    @media (min-width: 640px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 20px;
+      }
+      .modal-dialog {
+        border-radius: 20px !important;
+      }
+    }
+    .modal-dialog {
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      border: 1px solid var(--border);
+      padding: 22px;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-head .title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .modal-close {
+      font-size: 20px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    /* TIME DIAL / PICKER CONTROLS */
+    .dial-card {
+      background: var(--surface-high);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin: 10px 0 16px;
+    }
+    .ampm-toggle-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .ampm-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: var(--radius-btn);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .ampm-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 700;
+    }
+    .clock-dial-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .hour-circle {
+      height: 38px;
+      border-radius: 19px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .hour-circle:hover {
+      border-color: var(--accent);
+    }
+    .hour-circle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 800;
+    }
+    .minute-dial-row {
+      display: flex;
+      gap: 8px;
+    }
+    .minute-circle {
+      flex: 1;
+      height: 38px;
+      border-radius: var(--radius-btn);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .minute-circle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-inverse);
+      font-weight: 800;
+    }
+
+    /* Venue Quick Chips */
+    .venue-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .venue-chip {
+      background: var(--surface-high);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: var(--radius-chip);
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .venue-chip.active {
+      background: rgba(233, 139, 38, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Toast Notification */
+    .toast-box {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-btn);
+      padding: 12px 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-primary);
+      box-shadow: 0 8px 24px rgba(51, 48, 44, 0.16);
+      z-index: 400;
+      animation: fadeIn 0.2s ease-in-out;
+      white-space: nowrap;
+    }
+    .toast-box.show {
+      display: flex;
+    }
+
+    /* Mobile Smartphone Normalization Rules (max-width: 480px) */
+    @media (max-width: 480px) {
+      .app-header {
+        height: 54px;
+        padding: 0 14px;
+      }
+      .header-text .title {
+        font-size: 16px;
+      }
+      .header-text .subtitle {
+        font-size: 10px;
+      }
+      .responsive-split-view,
+      .cards-responsive-grid {
+        padding: 12px 14px;
+        gap: 12px;
+      }
+      .chip-scroll {
+        padding: 8px 14px;
+      }
+      .modal-dialog {
+        padding: 18px 14px;
+        border-radius: 20px 20px 0 0;
+        max-height: 90vh;
+      }
+      .tab-bar-container {
+        height: 64px;
+      }
+      .tab-bar-inner {
+        padding-bottom: 4px;
+      }
+      .tab-item {
+        font-size: 9.5px;
+      }
+      .tab-item.center-map .center-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 24px;
+      }
+      .tab-item.center-map .center-btn i {
+        font-size: 19px;
+      }
+      .section-segment-toggle {
+        margin: 8px 14px 12px;
+      }
+      .anon-banner {
+        margin: 8px 14px 12px;
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-root">
+    <div class="main-wrapper">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: 지도 (Scene Map) -> 장소와 이름만 등록    -->
+      <!-- ============================================== -->
+      <div id="tab-map" class="tab-panel">
+        <header class="app-header">
+          <div class="brand-section">
+            <div class="brand-logo">S</div>
+            <div class="header-text">
+              <div class="title"><i class="fa-solid fa-map-location-dot" style="color:var(--accent);"></i> Scene Map</div>
+              <div class="subtitle">촬영지 확인 및 장소와 이름 등록</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" onclick="openRegisterSpotModal()" style="min-height:38px; padding:6px 14px; font-size:12px;">
+              <i class="fa-solid fa-plus"></i> 장소 등록
+            </button>
+            <button class="btn btn-secondary" onclick="openStampBookModal()" style="min-height:38px; padding:6px 12px; font-size:12px;">
+              <i class="fa-solid fa-award" style="color:var(--accent);"></i> 스탬프북
+            </button>
+          </div>
+        </header>
+
+        <!-- Search & Filter Chips -->
+        <div class="chip-scroll">
+          <div class="chip active" onclick="filterMapByWork('all', this)">전체 촬영지 (10곳)</div>
+          <div class="chip" onclick="filterMapByWork('work-1', this)">달빛이 머무는 밤</div>
+          <div class="chip" onclick="filterMapByWork('work-2', this)">너와 나의 시그널</div>
+          <div class="chip" onclick="filterMapByWork('work-3', this)">청춘의 파도</div>
+          <div class="chip" onclick="filterMapByWork('work-4', this)">마지막 오케스트라</div>
+          <div class="chip" onclick="filterMapByWork('work-5', this)">네온 사일런스</div>
+        </div>
+
+        <!-- Automatic Multi-Column Split on Laptop/Desktop -->
+        <div class="map-flex-container">
+          <!-- Left: Dark Radar Map Canvas & Kakao Map Container -->
+          <div class="map-canvas" id="map-canvas" style="position:relative; width:100%; min-height:480px; overflow:hidden;">
+            <!-- Real Kakao Map Container (가로·세로 크기 명확히 지정) -->
+            <div id="kakao-map-real-container" style="display:none; width:100%; height:100%; min-height:480px; position:absolute; inset:0; z-index:12; border-radius:16px;"></div>
+
+            <!-- Kakao Map Integration Status Pill -->
+            <div id="kakao-map-status-pill" style="position:absolute; top:14px; left:14px; z-index:20; background:rgba(255,253,252,0.94); backdrop-filter:blur(6px); border:1px solid var(--border); border-radius:20px; padding:5px 12px; display:flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.06);" onclick="toggleKakaoMapInfo()">
+              <span style="width:8px; height:8px; border-radius:4px; background:#FEE500; display:inline-block; border:1px solid #D6BC00;"></span>
+              <span id="kakao-map-status-text" style="font-size:11px; font-weight:700; color:var(--text-primary);">Kakao Maps 연동 대기</span>
+              <i class="fa-solid fa-circle-info" style="font-size:11px; color:var(--text-secondary);"></i>
+            </div>
+
+            <!-- Radar Background Ring Overlay -->
+            <div id="radar-map-overlay" style="width:100%; height:100%; position:absolute; inset:0;">
+              <div class="radar-ring" style="width:220px; height:220px;"></div>
+              <div class="radar-ring" style="width:440px; height:440px;"></div>
+              <div class="radar-ring" style="width:660px; height:660px;"></div>
+
+              <!-- User GPS Location Marker -->
+              <div style="position:absolute; top:28%; left:36%; transform:translate(-50%, -50%); z-index:15;">
+                <div style="width:14px; height:14px; border-radius:7px; background:var(--success); border:2.5px solid #FFF;"></div>
+                <div style="font-size:10px; font-weight:700; color:var(--success); margin-top:2px; text-shadow:0 1px 3px rgba(0,0,0,0.8);">내 위치 (남산)</div>
+              </div>
+
+              <!-- Pins -->
+              <div class="pin-marker active" style="top:32%; left:40%;" onclick="selectMapPin(0, this)">
+                <div class="pin-bubble"><i class="fa-solid fa-clapperboard"></i></div>
+                <div class="pin-label">남산 백범광장 공원</div>
+              </div>
+
+              <div class="pin-marker" style="top:18%; left:58%;" onclick="selectMapPin(1, this)">
+                <div class="pin-bubble"><i class="fa-solid fa-clapperboard"></i></div>
+                <div class="pin-label">조경철천문대</div>
+              </div>
+
+              <div class="pin-marker" style="top:35%; left:46%;" onclick="selectMapPin(2, this)">
+                <div class="pin-bubble"><i class="fa-solid fa-clapperboard"></i></div>
+                <div class="pin-label">을지로 인쇄소 골목</div>
+              </div>
+
+              <div class="pin-marker" style="top:65%; left:72%;" onclick="selectMapPin(3, this)">
+                <div class="pin-bubble"><i class="fa-solid fa-clapperboard"></i></div>
+                <div class="pin-label">양양 서피비치</div>
+              </div>
+            </div>
+
+            <!-- GPS Floating Button -->
+            <button class="btn btn-secondary" style="position:absolute; bottom:16px; right:16px; border-radius:24px; min-height:40px; padding:0 14px; font-size:12px; background:rgba(255,253,252,0.92); backdrop-filter:blur(8px);" onclick="triggerToast('내 위치로 포커스되었습니다 (남산 백범광장)')">
+              <i class="fa-solid fa-location-crosshairs" style="color:var(--accent);"></i> 내 위치
+            </button>
+          </div>
+
+          <!-- Right Sidebar: Spot Details & Registered Spots -->
+          <div class="map-sidebar">
+            <!-- 1. 내가 등록한 장소 (장소와 이름만 등록) -->
+            <div class="registered-spots-bar">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700;"><i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> 내가 등록한 장소 (<span id="registered-spots-count">2</span>)</span>
+                <span style="font-size:11px; color:var(--accent); cursor:pointer; font-weight:600;" onclick="openRegisterSpotModal()">+ 새 장소 추가</span>
+              </div>
+              <div id="registered-spots-list">
+                <div class="registered-spot-item">
+                  <div>
+                    <div style="font-size:13px; font-weight:700; color:var(--text-primary);">남산 서울타워 전망대</div>
+                    <div style="font-size:11px; color:var(--text-secondary);">서울특별시 용산구 남산공원길 105 • 달빛이 머무는 밤</div>
+                  </div>
+                  <span style="font-size:11px; background:var(--surface-high); padding:3px 8px; border-radius:4px; color:var(--accent); font-weight:600;">등록됨</span>
+                </div>
+                <div class="registered-spot-item">
+                  <div>
+                    <div style="font-size:13px; font-weight:700; color:var(--text-primary);">정동 돌담길 벤치</div>
+                    <div style="font-size:11px; color:var(--text-secondary);">서울특별시 중구 정동길 46 • 너와 나의 시그널</div>
+                  </div>
+                  <span style="font-size:11px; background:var(--surface-high); padding:3px 8px; border-radius:4px; color:var(--accent); font-weight:600;">등록됨</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. 선택된 촬영지 정보 -->
+            <div class="card" id="map-detail-card" style="margin-bottom:14px;">
+              <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+                <img id="map-still-img" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600" style="width:100%; height:100%; object-fit:cover;" />
+                <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.85); font-size:10px; color:#FFF; padding:3px 8px; border-radius:6px; font-weight:700;" id="map-work-badge">
+                  달빛이 머무는 밤 • 12화
+                </div>
+                <div style="position:absolute; bottom:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:3px 8px; border-radius:6px; font-weight:700;">
+                  거리 85m (인증 가능)
+                </div>
+              </div>
+
+              <h3 id="map-loc-title" style="font-size:17px; font-weight:700; margin-bottom:4px;">남산 백범광장 공원 성곽길</h3>
+              <p id="map-loc-addr" style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+                <i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> 서울특별시 중구 회현동1가 100-115
+              </p>
+              <p id="map-loc-desc" style="font-size:12px; color:var(--text-secondary); line-height:18px; margin-bottom:16px;">
+                두 주인공이 천년 만에 재회하며 서로의 전생 기억을 확인하는 애틋한 장면의 배경지입니다.
+              </p>
+
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="openCertModal()">
+                  <i class="fa-solid fa-camera"></i> 방문 인증하기
+                </button>
+                <button class="btn btn-secondary" onclick="triggerToast('카카오맵으로 길안내를 시작합니다.')">
+                  <i class="fa-solid fa-route"></i> 길찾기
+                </button>
+                <button class="btn btn-secondary" onclick="saveLocationToArchive()">
+                  <i class="fa-regular fa-bookmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Future roadmap placeholders -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="card" style="padding:12px; text-align:center; opacity:0.75;">
+                <i class="fa-solid fa-cube" style="color:var(--accent); margin-bottom:4px;"></i>
+                <div style="font-size:11px; font-weight:700;">AR 인증샷</div>
+                <div style="font-size:10px; color:var(--text-muted);">준비 중</div>
+              </div>
+              <div class="card" style="padding:12px; text-align:center; opacity:0.75;">
+                <i class="fa-solid fa-mug-hot" style="color:var(--accent); margin-bottom:4px;"></i>
+                <div style="font-size:11px; font-weight:700;">제휴 카페 쿠폰</div>
+                <div style="font-size:10px; color:var(--text-muted);">준비 중</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: 캘린더 (Scene Calendar) -> 감독/배우 스케줄 -->
+      <!-- ============================================== -->
+      <div id="tab-calendar" class="tab-panel">
+        <header class="app-header">
+          <div class="brand-section">
+            <div class="brand-logo">S</div>
+            <div class="header-text">
+              <div class="title"><i class="fa-regular fa-calendar-days" style="color:var(--accent);"></i> 팬덤 캘린더</div>
+              <div class="subtitle">감독과 배우 정보 스케줄 확인</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="openReportEventModal()" style="min-height:38px; padding:6px 14px; font-size:12px;">
+            <i class="fa-solid fa-calendar-plus"></i> 일정 제보
+          </button>
+        </header>
+
+        <!-- Role & Person Filter Section -->
+        <div class="chip-scroll">
+          <div class="chip active" onclick="setCalendarRoleFilter('all', this)">전체 스케줄</div>
+          <div class="chip" onclick="setCalendarRoleFilter('actor', this)"><i class="fa-solid fa-user"></i> 배우별 스케줄</div>
+          <div class="chip" onclick="setCalendarRoleFilter('director', this)"><i class="fa-solid fa-video"></i> 감독별 스케줄</div>
+        </div>
+
+        <!-- Sub Person Quick Chips -->
+        <div style="padding: 8px 20px; background:var(--bg-subtle); border-bottom:1px solid var(--border); display:flex; gap:8px; overflow-x:auto;">
+          <span class="chip" style="font-size:11px; min-height:30px; padding:4px 10px;" onclick="filterCalendarByPerson('차은호', this)">배우 차은호</span>
+          <span class="chip" style="font-size:11px; min-height:30px; padding:4px 10px;" onclick="filterCalendarByPerson('윤서아', this)">배우 윤서아</span>
+          <span class="chip" style="font-size:11px; min-height:30px; padding:4px 10px;" onclick="filterCalendarByPerson('한도경', this)">배우 한도경</span>
+          <span class="chip" style="font-size:11px; min-height:30px; padding:4px 10px;" onclick="filterCalendarByPerson('김태원', this)">김태원 감독</span>
+          <span class="chip" style="font-size:11px; min-height:30px; padding:4px 10px;" onclick="filterCalendarByPerson('이지은', this)">이지은 감독</span>
+        </div>
+
+        <div class="responsive-split-view">
+          <!-- Left: Monthly Grid -->
+          <div>
+            <div class="card">
+              <!-- Calendar Nav Header -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; position:relative;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button onclick="changeCalMonth(-1)" style="background:none; border:none; cursor:pointer; color:var(--text-primary); font-size:16px; padding:4px 6px; border-radius:6px; line-height:1;" title="이전 달">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <button id="cal-title-btn" onclick="toggleCalPicker()" style="background:none; border:1px solid var(--border); border-radius:8px; cursor:pointer; color:var(--text-primary); font-size:15px; font-weight:700; padding:4px 12px; display:flex; align-items:center; gap:6px;">
+                    <span id="cal-title-text">2026년 11월</span>
+                    <i class="fa-solid fa-caret-down" style="font-size:11px; color:var(--accent);"></i>
+                  </button>
+                  <button onclick="changeCalMonth(1)" style="background:none; border:none; cursor:pointer; color:var(--text-primary); font-size:16px; padding:4px 6px; border-radius:6px; line-height:1;" title="다음 달">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+                <button onclick="goToToday()" style="background:var(--surface-high); border:none; border-radius:6px; cursor:pointer; color:var(--accent); font-size:11px; font-weight:700; padding:4px 10px;">오늘</button>
+
+                <!-- Year/Month Picker Dropdown -->
+                <div id="cal-picker" style="display:none; position:absolute; top:44px; left:0; z-index:200; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 8px 32px rgba(0,0,0,0.18); min-width:260px;">
+                  <!-- Year Selector -->
+                  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <button onclick="changePickerYear(-1)" style="background:var(--surface-high); border:none; border-radius:6px; cursor:pointer; color:var(--text-primary); font-size:13px; padding:4px 10px;">‹</button>
+                    <span id="picker-year-label" style="font-size:14px; font-weight:700;"></span>
+                    <button onclick="changePickerYear(1)" style="background:var(--surface-high); border:none; border-radius:6px; cursor:pointer; color:var(--text-primary); font-size:13px; padding:4px 10px;">›</button>
+                  </div>
+                  <!-- Month Grid -->
+                  <div id="picker-month-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;"></div>
+                  <button onclick="toggleCalPicker()" style="margin-top:12px; width:100%; background:var(--surface-high); border:none; border-radius:8px; color:var(--text-secondary); font-size:12px; padding:6px; cursor:pointer;">닫기</button>
+                </div>
+              </div>
+
+              <div class="cal-grid" id="cal-grid-body">
+                <div class="cal-day-label" style="color:var(--error);">일</div>
+                <div class="cal-day-label">월</div>
+                <div class="cal-day-label">화</div>
+                <div class="cal-day-label">수</div>
+                <div class="cal-day-label">목</div>
+                <div class="cal-day-label">금</div>
+                <div class="cal-day-label" style="color:var(--secondary);">토</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Event Cards Feed -->
+          <div id="calendar-events-container">
+            <div id="calendar-events-header" style="font-size:13px; font-weight:700; margin-bottom:10px; color:var(--text-secondary);">
+              2026-11-20 예정 일정 (1건)
+            </div>
+            <div id="calendar-events-list">
+              <!-- Event Cards dynamically rendered or initial state -->
+              <div class="card event-item" data-person="차은호 김태원" data-role="actor director">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <div style="display:flex; gap:6px;">
+                    <span style="font-size:11px; background:rgba(233,139,38,0.15); color:var(--accent); padding:3px 8px; border-radius:4px; font-weight:700;">
+                      GV(관객과의 대화)
+                    </span>
+                    <span style="font-size:11px; background:var(--surface-high); color:var(--text-secondary); padding:3px 8px; border-radius:4px; font-weight:600;">
+                      <i class="fa-solid fa-user-tie"></i> 차은호, 김태원 감독
+                    </span>
+                  </div>
+                  <button class="btn btn-secondary" style="min-height:30px; padding:2px 10px; font-size:11px;" onclick="triggerToast('당일 알림이 설정되었습니다.')">
+                    <i class="fa-solid fa-bell" style="color:var(--accent);"></i> 알림
+                  </button>
+                </div>
+                <h4 style="font-size:15px; font-weight:700; margin-bottom:6px;">&lt;달빛이 머무는 밤&gt; 종영 기념 스페셜 GV</h4>
+                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:3px;">
+                  <i class="fa-regular fa-clock"></i> 2026-11-20 19:30
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                  <i class="fa-solid fa-location-dot"></i> CGV 용산아이파크몰 4관
+                </div>
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">
+                  공식 출처: CJ ENM 공식 인스타그램 공지
+                </div>
+                <button class="btn btn-primary" style="width:100%; min-height:40px; font-size:13px;" onclick="triggerToast('공식 예매처(CGV)로 이동합니다.')">
+                  공식 예매처 이동 <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: 탐색 (Home Feeling) -> 익명 공유 DB      -->
+      <!-- ============================================== -->
+      <div id="tab-explore" class="tab-panel active">
+        <header class="app-header">
+          <div class="brand-section">
+            <div class="brand-logo">S</div>
+            <div class="header-text">
+              <div class="title"><i class="fa-solid fa-compass" style="color:var(--accent);"></i> 탐색</div>
+              <div class="subtitle">익명 공유 명장면 데이터베이스</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddCardModal()" style="min-height:38px; padding:6px 14px; font-size:12px;">
+            <i class="fa-solid fa-plus"></i> 장면 등록
+          </button>
+        </header>
+
+        <!-- Anonymous Notice Banner -->
+        <div class="anon-banner">
+          <i class="fa-solid fa-shield-halved" style="color:var(--accent); font-size:20px; flex-shrink:0;"></i>
+          <div>
+            모든 명장면은 프로필 없이 순수하게 <strong>익명으로 안전하게 공유</strong>됩니다.<br />
+            커뮤니티가 아닌 <strong>장면 데이터베이스</strong>이며, 마음에 드는 장면은 바로 <strong>[서랍에 저장]</strong>할 수 있습니다.
+          </div>
+        </div>
+
+        <!-- Emotion Filter Chips -->
+        <div class="chip-scroll">
+          <div class="chip active" onclick="setExploreFilter('all', this)">전체 (6)</div>
+          <div class="chip" onclick="setExploreFilter('설레는', this)">#설레는</div>
+          <div class="chip" onclick="setExploreFilter('가슴 벅찬', this)">#가슴 벅찬</div>
+          <div class="chip" onclick="setExploreFilter('심장 쫄깃한', this)">#심장 쫄깃한</div>
+          <div class="chip" onclick="setExploreFilter('소름 돋는', this)">#소름 돋는</div>
+          <div class="chip" onclick="setExploreFilter('유쾌한', this)">#유쾌한</div>
+          <div class="chip" onclick="setExploreFilter('여운 깊은', this)">#여운 깊은</div>
+        </div>
+
+        <!-- Anonymous Scene Database Grid -->
+        <div class="cards-responsive-grid" id="explore-cards-list">
+          <!-- Explore Card 1 -->
+          <div class="card explore-item" data-emotion="설레는">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #설레는
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                03화 42:15
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">달빛이 머무는 밤</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: 이강우</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "밤이 깊어질수록, 네 그림자가 더 선명해져."
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              남산 백범광장 야경 아래서 주인공 두 사람이 오랜 오해를 풀고 서로의 마음을 확인하는 명장면.
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#로맨스 #야경 #고백</span>
+              <button class="btn btn-primary" style="min-height:34px; padding:4px 12px; font-size:12px;" onclick="scrapExploreScene(this, '달빛이 머무는 밤', '밤이 깊어질수록, 네 그림자가 더 선명해져.', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800', '03화', '42:15', '설레는', '이강우')">
+                <i class="fa-regular fa-bookmark"></i> 서랍에 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Explore Card 2 -->
+          <div class="card explore-item" data-emotion="심장 쫄깃한">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #심장 쫄깃한
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                08화 15:30
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">너와 나의 시그널</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: 차수현</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "무전은 다시 울릴 거야. 우리가 포기하지 않는 한."
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              비 내리는 공중전화 부스에서 20년 전 무전 신호를 다시 잡기 위해 간절히 기다리는 긴박한 순간.
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#스릴러 #무전기 #시간여행</span>
+              <button class="btn btn-primary" style="min-height:34px; padding:4px 12px; font-size:12px;" onclick="scrapExploreScene(this, '너와 나의 시그널', '무전은 다시 울릴 거야. 우리가 포기하지 않는 한.', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800', '08화', '15:30', '심장 쫄깃한', '차수현')">
+                <i class="fa-regular fa-bookmark"></i> 서랍에 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Explore Card 3 -->
+          <div class="card explore-item" data-emotion="여운 깊은">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #여운 깊은
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                12화 58:20
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">청춘의 파도</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: 강태양</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "파도는 부서져도 바다는 그대로 남아있잖아."
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              강원도 양양 해변에서 마지막 서핑 시합을 마치고 청춘의 방황을 받아들이는 잔잔한 엔딩.
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#청춘 #바다 #성장</span>
+              <button class="btn btn-primary" style="min-height:34px; padding:4px 12px; font-size:12px;" onclick="scrapExploreScene(this, '청춘의 파도', '파도는 부서져도 바다는 그대로 남아있잖아.', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', '12화', '58:20', '여운 깊은', '강태양')">
+                <i class="fa-regular fa-bookmark"></i> 서랍에 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Explore Card 4 -->
+          <div class="card explore-item" data-emotion="소름 돋는">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #소름 돋는
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                영화 01:23:10
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">네온 사일런스</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: 케이</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "이 도시엔 침묵만이 가장 확실한 진실이야."
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              비에 젖은 사이버펑크 골목길에서 잠입 요원이 조직의 배후를 밝혀내는 결정적 단서를 포착하는 씬.
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#느와르 #네온 #추리</span>
+              <button class="btn btn-primary" style="min-height:34px; padding:4px 12px; font-size:12px;" onclick="scrapExploreScene(this, '네온 사일런스', '이 도시엔 침묵만이 가장 확실한 진실이야.', 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800', '영화', '01:23:10', '소름 돋는', '케이')">
+                <i class="fa-regular fa-bookmark"></i> 서랍에 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Explore Card 5 -->
+          <div class="card explore-item" data-emotion="가슴 벅찬">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #가슴 벅찬
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                영화 02:04:45
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">마지막 오케스트라</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: 윤마에</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "마지막 음이 끝나는 순간, 비로소 새로운 연주가 시작됩니다."
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              해체 위기의 오케스트라가 폐쇄된 극장에서 촛불만을 켠 채 연주하는 기적 같은 라흐마니노프 피날레.
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#클래식 #음악 #감동</span>
+              <button class="btn btn-primary" style="min-height:34px; padding:4px 12px; font-size:12px;" onclick="scrapExploreScene(this, '마지막 오케스트라', '마지막 음이 끝나는 순간, 비로소 새로운 연주가 시작됩니다.', 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800', '영화', '02:04:45', '가슴 벅찬', '윤마에')">
+                <i class="fa-regular fa-bookmark"></i> 서랍에 저장
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: 서랍 (Scene Archive) -> 2개 영역 분할     -->
+      <!-- ============================================== -->
+      <div id="tab-archive" class="tab-panel">
+        <header class="app-header">
+          <div class="brand-section">
+            <div class="brand-logo">S</div>
+            <div class="header-text">
+              <div class="title"><i class="fa-solid fa-box-archive" style="color:var(--accent);"></i> 명장면 서랍</div>
+              <div class="subtitle" id="archive-header-subtitle">나만의 기록과 스크랩 아카이브</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddCardModal()" style="min-height:38px; padding:6px 14px; font-size:12px;">
+            <i class="fa-solid fa-bookmark"></i> 장면기록
+          </button>
+        </header>
+
+        <!-- Two Distinct Area Segment Toggle -->
+        <div class="section-segment-toggle">
+          <div class="section-segment-btn active" id="btn-seg-my" onclick="switchArchiveSection('my')">
+            <i class="fa-solid fa-user-pen"></i> 내가 기록한 장면 (<span id="my-records-count">10</span>)
+          </div>
+          <div class="section-segment-btn" id="btn-seg-scraped" onclick="switchArchiveSection('scraped')">
+            <i class="fa-solid fa-bookmark"></i> 탐색에서 스크랩한 장면 (<span id="scraped-records-count">1</span>)
+          </div>
+        </div>
+
+        <!-- AREA 1: 내가 기록한 장면 -->
+        <div id="archive-section-my">
+          <!-- Collections Carousel Strip -->
+          <div style="padding: 6px 20px 4px; font-size:13px; font-weight:700; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+            <span><i class="fa-solid fa-folder" style="color:var(--accent);"></i> 나만의 컬렉션</span>
+            <span style="font-size:11px; color:var(--accent); cursor:pointer;">+ 새 컬렉션</span>
+          </div>
+          <div class="collections-strip" style="display:flex; gap:12px; overflow-x:auto; padding:10px 20px;">
+            <div class="col-thumb" style="width:140px; height:90px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
+              <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; inset:0; background:rgba(51,48,44,0.6); display:flex; flex-direction:column; justify-content:flex-end; padding:10px;">
+                <div style="font-size:11px; font-weight:700; color:#FFF;">가슴을 울린 밤하늘</div>
+                <div style="font-size:10px; color:#F0ECE5;">3개 장면</div>
+              </div>
+            </div>
+            <div class="col-thumb" style="width:140px; height:90px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
+              <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=400" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; inset:0; background:rgba(51,48,44,0.6); display:flex; flex-direction:column; justify-content:flex-end; padding:10px;">
+                <div style="font-size:11px; font-weight:700; color:#FFF;">미스터리 & 서스펜스</div>
+                <div style="font-size:10px; color:#F0ECE5;">2개 장면</div>
+              </div>
+            </div>
+            <div class="col-thumb" style="width:140px; height:90px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; inset:0; background:rgba(51,48,44,0.6); display:flex; flex-direction:column; justify-content:flex-end; padding:10px;">
+                <div style="font-size:11px; font-weight:700; color:#FFF;">푸른 바다와 청춘</div>
+                <div style="font-size:10px; color:#F0ECE5;">2개 장면</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emotion Filter Chips -->
+          <div class="chip-scroll">
+            <div class="chip active" onclick="setArchiveFilter('all', this)">전체 (10)</div>
+            <div class="chip" onclick="setArchiveFilter('설레는', this)">#설레는</div>
+            <div class="chip" onclick="setArchiveFilter('가슴 벅찬', this)">#가슴 벅찬</div>
+            <div class="chip" onclick="setArchiveFilter('심장 쫄깃한', this)">#심장 쫄깃한</div>
+            <div class="chip" onclick="setArchiveFilter('소름 돋는', this)">#소름 돋는</div>
+          </div>
+
+          <!-- My Cards Responsive Grid -->
+          <div class="cards-responsive-grid" id="archive-cards-list">
+            <!-- My Card 1 -->
+            <div class="card archive-item" data-emotion="설레는">
+              <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600" style="width:100%; height:100%; object-fit:cover;" />
+                <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+                  <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">12화 34:21</span>
+                  <span style="background:rgba(16,185,129,0.9); font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">공개</span>
+                </div>
+                <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#설레는</div>
+              </div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">달빛이 머무는 밤 • 차은호</div>
+              <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
+                "천 년이 흘러도, 밤하늘의 궤도는 언제나 널 가리키고 있었어."
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
+                남산 야경과 함께 눈물 핑 돌았던 명대사. 꼭 남산타워 가서 이 자리 찾아봐야지!
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+                <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('TVING 앱에서 해당 시점으로 바로 재생합니다.')">
+                  <i class="fa-solid fa-play" style="color:var(--accent);"></i> TVING에서 보기
+                </button>
+                <div style="display:flex; gap:14px;">
+                  <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('달빛이 머무는 밤', '천 년이 흘러도, 밤하늘의 궤도는 언제나 널 가리키고 있었어.')"></i>
+                  <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="triggerToast('장면이 서랍에서 삭제되었습니다.')"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- My Card 2 -->
+            <div class="card archive-item" data-emotion="심장 쫄깃한">
+              <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
+                <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600" style="width:100%; height:100%; object-fit:cover;" />
+                <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+                  <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">영화 01:23:10</span>
+                  <span style="background:rgba(110,103,95,0.9); font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">비공개</span>
+                </div>
+                <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#심장 쫄깃한</div>
+              </div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">네온 사일런스 • 케이</div>
+              <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
+                "이 도시엔 침묵만이 가장 확실한 진실이야."
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
+                느와르 분위기 연출이 압도적이었던 장면. 개인 소장용으로 비공개 기록함.
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+                <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('Watcha 앱에서 해당 시점으로 바로 재생합니다.')">
+                  <i class="fa-solid fa-play" style="color:var(--accent);"></i> Watcha에서 보기
+                </button>
+                <div style="display:flex; gap:14px;">
+                  <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('네온 사일런스', '이 도시엔 침묵만이 가장 확실한 진실이야.')"></i>
+                  <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="triggerToast('장면이 서랍에서 삭제되었습니다.')"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AREA 2: 탐색에서 스크랩한 장면 -->
+        <div id="archive-section-scraped" style="display:none;">
+          <div style="padding:10px 20px; font-size:12px; color:var(--text-secondary);">
+            <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> 탐색 탭의 익명 데이터베이스에서 스크랩하여 보관한 명장면 목록입니다.
+          </div>
+          <div class="cards-responsive-grid" id="scraped-cards-list">
+            <!-- Scraped Card 1 -->
+            <div class="card scraped-item" data-emotion="여운 깊은">
+              <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" style="width:100%; height:100%; object-fit:cover;" />
+                <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+                  <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">12화 58:20</span>
+                  <span style="background:rgba(233,139,38,0.9); font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">스크랩됨</span>
+                </div>
+                <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#여운 깊은</div>
+              </div>
+              <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">청춘의 파도 • 강태양</div>
+              <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
+                "파도는 부서져도 바다는 그대로 남아있잖아."
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
+                [익명 탐색 아카이브 스크랩] 강원도 양양 해변에서 마지막 서핑 시합을 마치고 청춘의 방황을 받아들이는 잔잔한 엔딩.
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+                <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('Netflix에서 해당 장면 재생')">
+                  <i class="fa-solid fa-play" style="color:var(--accent);"></i> Netflix에서 보기
+                </button>
+                <div style="display:flex; gap:14px;">
+                  <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('청춘의 파도', '파도는 부서져도 바다는 그대로 남아있잖아.')"></i>
+                  <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="this.closest('.card').remove(); triggerToast('스크랩이 삭제되었습니다.');"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- TAB 5: 마이 (My Profile) -> 계정 연동 및 환경설정 -->
+      <!-- ============================================== -->
+      <div id="tab-profile" class="tab-panel">
+        <header class="app-header">
+          <div class="brand-section">
+            <div class="brand-logo">S</div>
+            <div class="header-text">
+              <div class="title"><i class="fa-regular fa-user" style="color:var(--accent);"></i> 마이</div>
+              <div class="subtitle">계정 연동 및 환경설정</div>
+            </div>
+          </div>
+        </header>
+
+        <div class="responsive-split-view">
+          <!-- Profile Card -->
+          <div>
+            <div class="card" style="text-align:center;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" style="width:80px; height:80px; border-radius:40px; border:2px solid var(--accent); object-fit:cover; margin-bottom:10px;" />
+              <h3 style="font-size:18px; font-weight:700;">씨네필_민우</h3>
+              <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">빛과 어둠, 대사가 머무는 공간을 기록합니다 🎬</p>
+
+              <div style="display:flex; justify-content:space-around; margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+                <div>
+                  <div style="font-size:18px; font-weight:800; color:var(--accent);" id="prof-saved-count">10</div>
+                  <div style="font-size:11px; color:var(--text-secondary);">저장한 장면</div>
+                </div>
+                <div style="width:1px; background:var(--border);"></div>
+                <div>
+                  <div style="font-size:18px; font-weight:800; color:var(--accent);">1</div>
+                  <div style="font-size:11px; color:var(--text-secondary);">방문 스탬프</div>
+                </div>
+                <div style="width:1px; background:var(--border);"></div>
+                <div>
+                  <div style="font-size:18px; font-weight:800; color:var(--accent);">4</div>
+                  <div style="font-size:11px; color:var(--text-secondary);">관심 대상</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings & Activities Menu -->
+          <div>
+            <!-- Section 1: 계정 및 OTT 연동 -->
+            <div style="font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px; padding-left:4px;">
+              계정 및 OTT 연동
+            </div>
+            <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="openOttLinkModal()">
+                <span><i class="fa-solid fa-tv" style="color:var(--accent); width:24px;"></i> OTT 계정 연동 관리</span>
+                <span style="font-size:12px; color:var(--success); font-weight:700;">2개 플랫폼 연동됨 &gt;</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="openStampBookModal()">
+                <span><i class="fa-solid fa-ribbon" style="color:var(--accent); width:24px;"></i> 나의 스탬프북</span>
+                <span style="font-size:12px; color:var(--text-secondary);">1개 획득 &gt;</span>
+              </div>
+            </div>
+
+            <!-- Section 2: 환경설정 -->
+            <div style="font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px; padding-left:4px;">
+              환경설정
+            </div>
+            <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+                <span><i class="fa-solid fa-bell" style="color:var(--text-secondary); width:24px;"></i> 푸시 알림 설정</span>
+                <span style="font-size:12px; color:var(--accent); font-weight:700;">ON</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="triggerToast('현재 GPS 위치 서비스가 정상 작동 중입니다.')">
+                <span><i class="fa-solid fa-location-arrow" style="color:var(--text-secondary); width:24px;"></i> 위치 권한 안내</span>
+                <span style="font-size:12px; color:var(--success); font-weight:700;">허용됨 &gt;</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); cursor:pointer;" onclick="triggerToast('캐시 데이터(18.4MB)가 정리되었습니다.')">
+                <span><i class="fa-solid fa-broom" style="color:var(--text-secondary); width:24px;"></i> 캐시 데이터 정리</span>
+                <span style="font-size:12px; color:var(--text-secondary);">18.4MB &gt;</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; cursor:pointer;" onclick="triggerToast('안전하게 로그아웃되었습니다.')">
+                <span style="color:var(--error);"><i class="fa-solid fa-arrow-right-from-bracket" style="width:24px;"></i> 로그아웃</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fixed Bottom 5-Tab Bar (Exact User Order) -->
+    <nav class="tab-bar-container">
+      <div class="tab-bar-inner">
+        <!-- 1. 지도 -> 장소와 이름만 등록 -->
+        <div class="tab-item" onclick="switchTab('map', this)">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>지도</span>
+        </div>
+
+        <!-- 2. 캘린더 -> 감독과 배우 정보 스케줄 확인 -->
+        <div class="tab-item" onclick="switchTab('calendar', this)">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span>캘린더</span>
+        </div>
+
+        <!-- 3. 탐색 (Home Feeling, Center Prominent Button) -->
+        <div class="tab-item center-map active" onclick="switchTab('explore', this)">
+          <div class="center-btn">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <span>탐색</span>
+        </div>
+
+        <!-- 4. 서랍 -> 내가 만든것 & 스크랩한 것 2대 영역 -->
+        <div class="tab-item" onclick="switchTab('archive', this)">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>서랍</span>
+        </div>
+
+        <!-- 5. 마이 -> 계정 연동 및 환경설정 -->
+        <div class="tab-item" onclick="switchTab('profile', this)">
+          <i class="fa-regular fa-user"></i>
+          <span>마이</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============================================== -->
+    <!-- INTERACTIVE MODALS                             -->
+    <!-- ============================================== -->
+
+    <!-- 1. Spot Register Modal (1. 지도: 장소와 이름만 등록) -->
+    <div class="modal-backdrop" id="register-spot-modal" onclick="if(event.target===this) closeModal('register-spot-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> 장소 등록</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('register-spot-modal')"></i>
+        </div>
+
+        <div style="background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.2); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-secondary); line-height:16px;">
+          나만의 촬영지 또는 기억하고 싶은 <strong>장소와 이름만 등록</strong>해보세요.
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">장소 이름 *</label>
+          <input type="text" id="new-spot-name" placeholder="예: 남산 백범광장 공원, 북촌 한옥마을" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">상세 위치 및 주소 *</label>
+          <input type="text" id="new-spot-address" placeholder="예: 서울 용산구 남산공원길 105" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <div style="margin-bottom:16px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">관련 작품 (OTT 연동 검색)</label>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <span style="font-size:10px; background:#FF143C; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">TVING</span>
+              <span style="font-size:10px; background:#0075FF; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">Wavve</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <input type="text" id="new-spot-work" oninput="searchSpotWork(this.value)" onfocus="searchSpotWork(this.value)" placeholder="연동된 티빙·웨이브 작품명을 검색하세요 (예: 달빛, 시그널, 파도)" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 36px 10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; right:12px; top:12px; color:var(--accent); font-size:13px;"></i>
+          </div>
+          <!-- 선택된 작품 태그 -->
+          <div id="new-spot-selected-tag" style="display:none; margin-top:8px; align-items:center; justify-content:space-between; background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.3); padding:6px 12px; border-radius:8px;">
+            <span id="new-spot-selected-label" style="font-size:12px; font-weight:700; color:var(--text-primary);"></span>
+            <i class="fa-solid fa-xmark" style="cursor:pointer; color:var(--text-secondary); font-size:14px;" onclick="clearSpotWorkSelection()"></i>
+          </div>
+          <!-- 실시간 드롭다운 -->
+          <div id="spot-work-dropdown" style="display:none; position:absolute; left:0; right:0; top:66px; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-height:180px; overflow-y:auto; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.18);"></div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('register-spot-modal')">취소</button>
+          <button class="btn btn-primary" style="flex:2;" onclick="submitNewSpot()">장소 등록하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Scene Record Modal (명장면서랍 - 장면기록 팝업 + 공개/비공개 옵션) -->
+    <div class="modal-backdrop" id="add-card-modal" onclick="if(event.target===this) closeModal('add-card-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-bookmark" style="color:var(--accent);"></i> 새 명장면 서랍 기록</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('add-card-modal')"></i>
+        </div>
+
+        <div style="background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.2); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-secondary); line-height:16px;">
+          <i class="fa-solid fa-clapperboard" style="color:var(--accent); margin-right:4px;"></i> 시청 중인 장면의 스틸컷과 대사, 감정을 기록하여 나만의 명장면 서랍에 보관하세요.
+        </div>
+
+        <!-- 공개 / 비공개 옵션 -->
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">공개 / 비공개 설정 *</label>
+          <div class="privacy-toggle-row">
+            <div class="privacy-toggle-btn active" id="priv-public-btn" onclick="setCardPrivacy(true)">
+              <i class="fa-solid fa-globe"></i> 공개 (익명 탐색 DB 공유)
+            </div>
+            <div class="privacy-toggle-btn" id="priv-private-btn" onclick="setCardPrivacy(false)">
+              <i class="fa-solid fa-lock"></i> 비공개 (나만의 보관)
+            </div>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px;" id="priv-helper-text">
+            공개 시 탐색 탭의 익명 DB에 공유되어 다른 이용자가 감상하고 스크랩할 수 있습니다 (프로필은 노출되지 않습니다).
+          </div>
+        </div>
+
+        <!-- 대표 스틸컷 선택 -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">대표 스틸컷 선택 *</label>
+            <span style="font-size:11px; color:var(--accent); font-weight:600;" id="still-selected-label">남산 야경 명장면</span>
+          </div>
+
+          <div style="height:150px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:10px; border:1px solid var(--border);">
+            <img id="new-card-still-preview" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600" style="width:100%; height:100%; object-fit:cover; transition:all 0.2s;" />
+            <div style="position:absolute; bottom:8px; left:8px; background:rgba(51,48,44,0.75); backdrop-filter:blur(4px); font-size:10px; color:#FFF; padding:3px 8px; border-radius:6px; font-weight:700;" id="preview-badge-ep">
+              12화 34:21
+            </div>
+            <div style="position:absolute; bottom:8px; right:8px; background:rgba(233,139,38,0.9); backdrop-filter:blur(4px); font-size:10px; color:#FFF; padding:3px 8px; border-radius:6px; font-weight:700;" id="preview-badge-emo">
+              #설레는
+            </div>
+          </div>
+
+          <!-- 스틸컷 선택 썸네일 스트립 -->
+          <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:6px;">
+            <div class="still-select-thumb active" style="width:68px; height:46px; border-radius:8px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid var(--accent); position:relative;" onclick="selectCardStill('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600', '남산 야경 명장면', this)">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=200" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="still-select-thumb" style="width:68px; height:46px; border-radius:8px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid var(--border); position:relative;" onclick="selectCardStill('https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600', '을지로 네온 골목', this)">
+              <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=200" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="still-select-thumb" style="width:68px; height:46px; border-radius:8px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid var(--border); position:relative;" onclick="selectCardStill('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', '강릉 파도 해변', this)">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="still-select-thumb" style="width:68px; height:46px; border-radius:8px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid var(--border); position:relative;" onclick="selectCardStill('https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600', '오케스트라 무대', this)">
+              <img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=200" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 작품 선택 (OTT 연동 검색) -->
+        <div style="margin-bottom:14px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">작품 선택 (OTT 연동 검색) *</label>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <span style="font-size:10px; color:var(--text-muted);">연동:</span>
+              <span style="font-size:10px; background:#FF143C; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">TVING</span>
+              <span style="font-size:10px; background:#0075FF; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">Wavve</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <input type="text" id="card-work-search-input" oninput="searchCardWork(this.value)" onfocus="searchCardWork(this.value)" placeholder="시청 중인 OTT 작품명을 검색하세요 (예: 달빛, 파도, 오케스트라)" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 36px 10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; right:12px; top:12px; color:var(--accent); font-size:13px;"></i>
+          </div>
+          <!-- 현재 선택된 OTT 작품 상태 뱃지 -->
+          <div id="card-selected-work-box" style="margin-top:8px; display:flex; align-items:center; justify-content:space-between; background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.3); padding:8px 12px; border-radius:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="card-work-ott-badge" style="font-size:10px; background:#FF143C; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">TVING</span>
+              <span id="card-work-title-display" style="font-size:13px; font-weight:700; color:var(--text-primary);">달빛이 머무는 밤</span>
+              <span style="font-size:11px; color:var(--success); font-weight:600;"><i class="fa-solid fa-check"></i> 연동 확인</span>
+            </div>
+            <span style="font-size:11px; color:var(--accent); font-weight:700; cursor:pointer;" onclick="focusCardWorkInput()">다른 작품 검색</span>
+          </div>
+          <!-- OTT 검색 결과 드롭다운 -->
+          <div id="card-work-dropdown" style="display:none; position:absolute; left:0; right:0; top:66px; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-height:190px; overflow-y:auto; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.18);"></div>
+          <input type="hidden" id="card-selected-work-val" value="달빛이 머무는 밤" />
+        </div>
+
+        <!-- 회차 및 재생 시점 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">회차</label>
+            <input type="text" id="new-card-episode" value="12화" placeholder="예: 12화" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" oninput="updateCardBadgePreview()" />
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">재생 시점</label>
+            <input type="text" id="new-card-time" value="34:21" placeholder="예: 34:21" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" oninput="updateCardBadgePreview()" />
+          </div>
+        </div>
+
+        <!-- 명대사 입력 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">명대사 *</label>
+          <textarea id="new-card-quote" placeholder="가슴을 울렸던 대사 또는 인상 깊은 장면 대사를 입력해주세요..." style="width:100%; min-height:64px; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none; resize:none; line-height:18px;"></textarea>
+        </div>
+
+        <!-- 인물 / 배우명 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">대사를 한 인물 / 배우</label>
+          <input type="text" id="new-card-character" value="차은호" placeholder="예: 차은호, 윤서아" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <!-- 감정 태그 칩 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">감정 태그 *</label>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;" id="card-emotion-chips">
+            <div class="chip active" onclick="selectCardEmotion('설레는', this)">#설레는</div>
+            <div class="chip" onclick="selectCardEmotion('가슴 벅찬', this)">#가슴 벅찬</div>
+            <div class="chip" onclick="selectCardEmotion('눈물 나는', this)">#눈물 나는</div>
+            <div class="chip" onclick="selectCardEmotion('심장 쫄깃한', this)">#심장 쫄깃한</div>
+            <div class="chip" onclick="selectCardEmotion('소름 돋는', this)">#소름 돋는</div>
+            <div class="chip" onclick="selectCardEmotion('유쾌한', this)">#유쾌한</div>
+            <div class="chip" onclick="selectCardEmotion('여운 깊은', this)">#여운 깊은</div>
+          </div>
+        </div>
+
+        <!-- 개인 감상 메모 -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">개인 감상 메모</label>
+          <textarea id="new-card-memo" placeholder="이 장면을 보며 느낀 감정이나 나만의 감상 포인트를 메모해보세요..." style="width:100%; min-height:56px; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none; resize:none; line-height:18px;"></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; min-height:46px; font-size:14px;" onclick="submitNewArchiveCard()">
+          <i class="fa-solid fa-check"></i> 명장면 서랍에 저장하기
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. 일정 제보 팝업 (다이얼 시간 & 장소 설정) -->
+    <div class="modal-backdrop" id="report-event-modal" onclick="if(event.target===this) closeModal('report-event-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-calendar-plus" style="color:var(--accent);"></i> 새 팬덤 일정 제보</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('report-event-modal')"></i>
+        </div>
+
+        <div style="background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.2); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-secondary); line-height:16px;">
+          공식 출처가 확인된 영화제·GV·무대인사·시사회 일정을 제보해주세요. 검증 후 전체 이용자 캘린더에 반영됩니다.
+        </div>
+
+        <!-- 이벤트 유형 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">이벤트 유형 *</label>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <div class="chip active" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); this.classList.add('active');">무대인사</div>
+            <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); this.classList.add('active');">스페셜 GV</div>
+            <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); this.classList.add('active');">시사회</div>
+            <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); this.classList.add('active');">영화제</div>
+            <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); this.classList.add('active');">팝업 전시</div>
+          </div>
+        </div>
+
+        <!-- 일정 제목 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">일정 제목 *</label>
+          <input type="text" id="report-title-input" placeholder="예: &lt;달빛이 머무는 밤&gt; 주연배우 무대인사" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <!-- 날짜 및 시간 다이얼 -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">일정 일시 및 시간 다이얼 설정 *</label>
+            <span style="font-size:11px; color:var(--accent); font-weight:700;" id="dial-display-time">오후 07:30 (19:30)</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:10px; margin-bottom:8px;">
+            <input type="date" id="report-date-input" value="2026-11-20" style="background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text-primary); font-size:12px; outline:none;" />
+            <input type="text" id="report-time-input" value="19:30" readonly style="background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--accent); font-weight:700; font-size:12px; text-align:center; outline:none;" />
+          </div>
+
+          <div class="dial-card">
+            <div class="ampm-toggle-row">
+              <div class="ampm-btn" id="ampm-am" onclick="setAmPm(true)">오전 (AM)</div>
+              <div class="ampm-btn active" id="ampm-pm" onclick="setAmPm(false)">오후 (PM)</div>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">시간 선택 (1시 ~ 12시)</div>
+            <div class="clock-dial-grid">
+              <div class="hour-circle" onclick="selectDialHour(1, this)">1</div>
+              <div class="hour-circle" onclick="selectDialHour(2, this)">2</div>
+              <div class="hour-circle" onclick="selectDialHour(3, this)">3</div>
+              <div class="hour-circle" onclick="selectDialHour(4, this)">4</div>
+              <div class="hour-circle" onclick="selectDialHour(5, this)">5</div>
+              <div class="hour-circle" onclick="selectDialHour(6, this)">6</div>
+              <div class="hour-circle active" onclick="selectDialHour(7, this)">7</div>
+              <div class="hour-circle" onclick="selectDialHour(8, this)">8</div>
+              <div class="hour-circle" onclick="selectDialHour(9, this)">9</div>
+              <div class="hour-circle" onclick="selectDialHour(10, this)">10</div>
+              <div class="hour-circle" onclick="selectDialHour(11, this)">11</div>
+              <div class="hour-circle" onclick="selectDialHour(12, this)">12</div>
+            </div>
+
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">분 선택</div>
+            <div class="minute-dial-row">
+              <div class="minute-circle" onclick="selectDialMinute('00', this)">:00</div>
+              <div class="minute-circle" onclick="selectDialMinute('15', this)">:15</div>
+              <div class="minute-circle active" onclick="selectDialMinute('30', this)">:30</div>
+              <div class="minute-circle" onclick="selectDialMinute('45', this)">:45</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 장소 입력 -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">장소 *</label>
+          <input type="text" id="report-location-input" value="CGV 용산아이파크몰 4관" placeholder="예: 메가박스 코엑스 컴포트관" style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+          <div class="venue-chips-wrap">
+            <span class="venue-chip" onclick="document.getElementById('report-location-input').value='CGV 용산아이파크몰'">CGV 용산아이파크몰</span>
+            <span class="venue-chip" onclick="document.getElementById('report-location-input').value='메가박스 코엑스'">메가박스 코엑스</span>
+            <span class="venue-chip" onclick="document.getElementById('report-location-input').value='롯데시네마 월드타워'">롯데시네마 월드타워</span>
+            <span class="venue-chip" onclick="document.getElementById('report-location-input').value='영화의전당 야외극장'">영화의전당 (부산)</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; min-height:46px; font-size:14px;" onclick="submitReportEvent()">
+          <i class="fa-solid fa-paper-plane"></i> 일정 제보 제출하기
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. 방문 인증 모달 -->
+    <div class="modal-backdrop" id="cert-modal" onclick="if(event.target===this) closeModal('cert-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-camera" style="color:var(--accent);"></i> 촬영지 방문 인증</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('cert-modal')"></i>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          원본 스틸컷 구도를 참고하여 인증 사진을 촬영하고 디지털 스탬프를 획득하세요!
+        </p>
+
+        <div style="height:220px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:14px; border:2px dashed var(--accent); background:#151C33; display:flex; align-items:center; justify-content:center;">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600" style="width:100%; height:100%; object-fit:cover; opacity:0.35;" />
+          <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+            <i class="fa-solid fa-crosshairs" style="font-size:48px; color:var(--accent); animation: pulse 2s infinite;"></i>
+            <span style="font-size:12px; color:#FFF; font-weight:700; background:rgba(12,18,36,0.8); padding:4px 10px; border-radius:12px;">스틸컷 구도 일치율 94%</span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('cert-modal')">취소</button>
+          <button class="btn btn-primary" style="flex:2;" onclick="completeCertification()">
+            <i class="fa-solid fa-stamp"></i> 인증 촬영 및 스탬프 받기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 스탬프북 모달 -->
+    <div class="modal-backdrop" id="stampbook-modal" onclick="if(event.target===this) closeModal('stampbook-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-award" style="color:var(--accent);"></i> 나의 성지순례 스탬프북</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('stampbook-modal')"></i>
+        </div>
+        <div class="card" style="margin-bottom:14px; background:rgba(233, 139, 38, 0.1); border-color:var(--accent);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:11px; color:var(--accent); font-weight:700;">시즌 성지순례 마스터</div>
+              <div style="font-size:15px; font-weight:800; margin-top:2px;">달빛이 머무는 밤 정주행</div>
+            </div>
+            <div style="font-size:18px; font-weight:800; color:var(--accent);">1 / 3</div>
+          </div>
+          <div style="height:6px; background:var(--surface-high); border-radius:3px; margin-top:10px; overflow:hidden;">
+            <div style="width:33%; height:100%; background:var(--accent);"></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <div style="border:1px solid var(--accent); border-radius:12px; padding:12px; text-align:center; background:rgba(233,139,38,0.06);">
+            <div style="width:50px; height:50px; border-radius:25px; background:var(--accent); color:#FFF; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:22px;">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div style="font-size:12px; font-weight:700;">남산 백범광장</div>
+            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">2026-10-15 인증</div>
+          </div>
+          <div style="border:1px dashed var(--border); border-radius:12px; padding:12px; text-align:center; opacity:0.6;">
+            <div style="width:50px; height:50px; border-radius:25px; background:var(--surface-high); color:var(--text-disabled); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:22px;">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <div style="font-size:12px; font-weight:700;">조경철천문대</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">미방문</div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" style="width:100%;" onclick="closeModal('stampbook-modal')">닫기</button>
+      </div>
+    </div>
+
+    <!-- 6. 공유 카드 생성기 모달 -->
+    <div class="modal-backdrop" id="share-modal" onclick="if(event.target===this) closeModal('share-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-share-nodes" style="color:var(--accent);"></i> 시네마틱 공유 카드</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('share-modal')"></i>
+        </div>
+
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
+          <div class="chip active" onclick="applyShareTemplate('minimal')">미니멀</div>
+          <div class="chip" onclick="applyShareTemplate('filmstrip')">필름 스트립</div>
+          <div class="chip" onclick="applyShareTemplate('neon')">네온</div>
+          <div class="chip" onclick="applyShareTemplate('editorial')">에디토리얼</div>
+          <div class="chip" onclick="applyShareTemplate('polaroid')">폴라로이드</div>
+        </div>
+
+        <div id="share-preview-card" style="border:2px solid var(--accent); border-radius:16px; padding:20px; background:#33302C; color:#FFF; margin-bottom:16px; text-align:center; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+          <div style="font-size:11px; letter-spacing:1px; color:var(--accent); font-weight:800; margin-bottom:10px;" id="share-work-text">달빛이 머무는 밤 • SCENE-IN</div>
+          <div style="font-size:16px; font-style:italic; font-weight:700; line-height:24px; margin-bottom:16px;" id="share-quote-text">
+            "천 년이 흘러도, 밤하늘의 궤도는 언제나 널 가리키고 있었어."
+          </div>
+          <div style="font-size:10px; color:#A8B1CC;">저장일: 2026.11.22 • SCENE-IN Official Archive</div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="triggerToast('이미지로 저장되었습니다.')">
+            <i class="fa-solid fa-download"></i> 이미지 저장
+          </button>
+          <button class="btn btn-primary" style="flex:1;" onclick="triggerToast('SNS 공유 시트를 열었습니다.')">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i> 인스타 공유
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. OTT 연동 모달 -->
+    <div class="modal-backdrop" id="ott-modal" onclick="if(event.target===this) closeModal('ott-modal')">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-tv" style="color:var(--accent);"></i> OTT 계정 연동</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('ott-modal')"></i>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+          연동 시 해당 장면의 정확한 재생 시점으로 1초 만에 바로 이어보실 수 있습니다.
+        </p>
+
+        <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-play" style="color:#FF143C; font-size:20px;"></i>
+            <div>
+              <div style="font-size:13px; font-weight:700;">TVING (티빙)</div>
+              <div style="font-size:11px; color:var(--success);">연동 완료 (cinephile_01)</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="min-height:28px; padding:2px 10px; font-size:11px;" onclick="triggerToast('티빙 연동 해제')">해제</button>
+        </div>
+
+        <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-water" style="color:#0075FF; font-size:20px;"></i>
+            <div>
+              <div style="font-size:13px; font-weight:700;">Wavve (웨이브)</div>
+              <div style="font-size:11px; color:var(--success);">연동 완료</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="min-height:28px; padding:2px 10px; font-size:11px;" onclick="triggerToast('웨이브 연동 해제')">해제</button>
+        </div>
+
+        <button class="btn btn-secondary" style="width:100%;" onclick="closeModal('ott-modal')">닫기</button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-box" id="toast-box">
+      <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:16px;"></i>
+      <span id="toast-text">알림 메시지</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+
+      const target = document.getElementById('tab-' + tabId);
+      if (target) {
+        target.classList.add('active');
+      }
+      element.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toast Notification Helper
+    let toastTimeout;
+    function triggerToast(msg) {
+      const box = document.getElementById('toast-box');
+      const text = document.getElementById('toast-text');
+      text.innerText = msg;
+      box.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        box.classList.remove('show');
+      }, 2500);
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function openRegisterSpotModal() {
+      openModal('register-spot-modal');
+    }
+
+    function openAddCardModal() {
+      openModal('add-card-modal');
+    }
+
+    function openReportEventModal() {
+      openModal('report-event-modal');
+    }
+
+    function openCertModal() {
+      openModal('cert-modal');
+    }
+
+    function openStampBookModal() {
+      openModal('stampbook-modal');
+    }
+
+    function openOttLinkModal() {
+      openModal('ott-modal');
+    }
+
+    function openShareModal(work, quote) {
+      document.getElementById('share-work-text').innerText = work + ' • SCENE-IN';
+      document.getElementById('share-quote-text').innerText = quote;
+      openModal('share-modal');
+    }
+
+    // Spot Registration Logic (1. 지도: 장소와 이름만 등록)
+    let registeredSpotsCount = 2;
+    function submitNewSpot() {
+      const name = document.getElementById('new-spot-name').value.trim();
+      const addr = document.getElementById('new-spot-address').value.trim();
+      const work = document.getElementById('new-spot-work').value.trim();
+
+      if (!name) {
+        triggerToast('장소 이름을 입력해주세요!');
+        document.getElementById('new-spot-name').focus();
+        return;
+      }
+      if (!addr) {
+        triggerToast('상세 위치 및 주소를 입력해주세요!');
+        document.getElementById('new-spot-address').focus();
+        return;
+      }
+
+      registeredSpotsCount++;
+      document.getElementById('registered-spots-count').innerText = registeredSpotsCount;
+
+      const list = document.getElementById('registered-spots-list');
+      const html = `
+        <div class="registered-spot-item" style="animation: slideUp 0.25s ease-out;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:var(--text-primary);">${name}</div>
+            <div style="font-size:11px; color:var(--text-secondary);">${addr} ${work ? '• ' + work : ''}</div>
+          </div>
+          <span style="font-size:11px; background:var(--surface-high); padding:3px 8px; border-radius:4px; color:var(--accent); font-weight:600;">등록됨</span>
+        </div>
+      `;
+      list.insertAdjacentHTML('afterbegin', html);
+
+      document.getElementById('new-spot-name').value = '';
+      document.getElementById('new-spot-address').value = '';
+      document.getElementById('new-spot-work').value = '';
+
+      closeModal('register-spot-modal');
+      triggerToast('🎉 새 장소가 지도에 등록되었습니다!');
+    }
+
+    // Time Dial State & Interaction (캘린더 일정 제보)
+    let dialIsAm = false;
+    let dialHour = 7;
+    let dialMinute = '30';
+
+    function updateDialDisplay() {
+      let hour24 = dialHour;
+      if (!dialIsAm && dialHour < 12) hour24 += 12;
+      if (dialIsAm && dialHour === 12) hour24 = 0;
+      const formatted24 = String(hour24).padStart(2, '0') + ':' + dialMinute;
+      const label = (dialIsAm ? '오전' : '오후') + ' ' + String(dialHour).padStart(2, '0') + ':' + dialMinute + ' (' + formatted24 + ')';
+      document.getElementById('dial-display-time').innerText = label;
+      document.getElementById('report-time-input').value = formatted24;
+    }
+
+    function setAmPm(isAm) {
+      dialIsAm = isAm;
+      document.getElementById('ampm-am').className = 'ampm-btn ' + (isAm ? 'active' : '');
+      document.getElementById('ampm-pm').className = 'ampm-btn ' + (!isAm ? 'active' : '');
+      updateDialDisplay();
+    }
+
+    function selectDialHour(hour, el) {
+      dialHour = hour;
+      document.querySelectorAll('.hour-circle').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      updateDialDisplay();
+    }
+
+    function selectDialMinute(minute, el) {
+      dialMinute = minute;
+      document.querySelectorAll('.minute-circle').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      updateDialDisplay();
+    }
+
+    function submitReportEvent() {
+      const title = document.getElementById('report-title-input').value.trim();
+      const location = document.getElementById('report-location-input').value.trim();
+      if (!title) {
+        triggerToast('일정 제목을 입력해주세요!');
+        return;
+      }
+      closeModal('report-event-modal');
+      triggerToast('🎉 일정이 성공적으로 제보되었습니다! 검증 후 노출됩니다.');
+    }
+
+    // ── Calendar Year/Month Navigator ────────────────────────────────
+    const CALENDAR_EVENTS_DB = {
+      '2026-11-20': [
+        {
+          type: 'GV(관객과의 대화)',
+          badgeColor: 'var(--accent)',
+          badgeBg: 'rgba(233,139,38,0.15)',
+          person: '차은호, 김태원 감독',
+          personAttr: '차은호 김태원',
+          roleAttr: 'actor director',
+          title: '<달빛이 머무는 밤> 종영 기념 스페셜 GV',
+          time: '2026-11-20 19:30',
+          location: 'CGV 용산아이파크몰 4관',
+          source: 'CJ ENM 공식 인스타그램 공지',
+          ticketVendor: 'CGV'
+        }
+      ],
+      '2026-11-22': [
+        {
+          type: '무대인사',
+          badgeColor: 'var(--success)',
+          badgeBg: 'rgba(16,185,129,0.15)',
+          person: '윤서아, 이지은 감독',
+          personAttr: '윤서아 이지은',
+          roleAttr: 'actor director',
+          title: '<청춘의 파도> 개봉 1주차 주연배우 서울 무대인사',
+          time: '2026-11-22 14:00',
+          location: '메가박스 코엑스 컴포트관',
+          source: '배급사 공식 보도자료',
+          ticketVendor: '메가박스'
+        }
+      ],
+      '2026-11-25': [
+        {
+          type: 'OTT 독점공개',
+          badgeColor: '#0075FF',
+          badgeBg: 'rgba(0,117,255,0.15)',
+          person: '한도경 배우',
+          personAttr: '한도경',
+          roleAttr: 'actor',
+          title: '<너와 나의 시그널> 파트2 전편 웨이브 독점 공개',
+          time: '2026-11-25 16:00',
+          location: 'Wavve 앱 온라인 스트리밍',
+          source: '웨이브 공식 편성표',
+          ticketVendor: 'Wavve 바로가기'
+        }
+      ],
+      '2026-11-27': [
+        {
+          type: '제작보고회',
+          badgeColor: '#FF143C',
+          badgeBg: 'rgba(255,20,60,0.15)',
+          person: '차은호, 한도경',
+          personAttr: '차은호 한도경',
+          roleAttr: 'actor',
+          title: '<도심의 불빛> 티빙 오리지널 온라인 제작발표회',
+          time: '2026-11-27 11:00',
+          location: 'TVING 공식 유튜브 & 라이브관',
+          source: '티빙 공식 보도자료',
+          ticketVendor: 'TVING 바로가기'
+        }
+      ],
+      '2026-11-28': [
+        {
+          type: '시사회',
+          badgeColor: 'var(--success)',
+          badgeBg: 'rgba(16,185,129,0.15)',
+          person: '김태원 감독',
+          personAttr: '김태원',
+          roleAttr: 'director',
+          title: '<겨울의 온기> VIP 언론 배급 시사회',
+          time: '2026-11-28 15:30',
+          location: '롯데시네마 월드타워 8관',
+          source: '영화진흥위원회 공지',
+          ticketVendor: '롯데시네마'
+        }
+      ]
+    };
+
+    let calState = { year: 2026, month: 11, selectedDay: 20 }; // month: 1-based
+    let pickerState = { year: 2026 };
+    let calPickerOpen = false;
+
+    function renderCalGrid() {
+      const { year, month } = calState;
+      const grid = document.getElementById('cal-grid-body');
+      // keep day-labels (first 7 children), remove day cells
+      while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+      const firstDay = new Date(year, month - 1, 1).getDay(); // 0=Sun
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === month;
+      const todayDate = today.getDate();
+
+      // blank cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const blank = document.createElement('div');
+        blank.className = 'cal-cell';
+        blank.style.opacity = '0';
+        grid.appendChild(blank);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell';
+        const dateKey = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasEvent = CALENDAR_EVENTS_DB[dateKey] && CALENDAR_EVENTS_DB[dateKey].length > 0;
+        const isToday = isCurrentMonth && d === todayDate;
+        const isSelected = calState.selectedDay === d;
+
+        if (isSelected) {
+          cell.classList.add('selected');
+        }
+        if (isToday) {
+          cell.style.cssText = 'border:2px solid var(--accent); border-radius:8px; font-weight:700;';
+        }
+        cell.onclick = () => selectCalDay(d, cell);
+
+        const dayNum = document.createTextNode(d);
+        cell.appendChild(dayNum);
+
+        if (hasEvent) {
+          const dot = document.createElement('div');
+          dot.className = 'cal-dot';
+          cell.appendChild(dot);
+        }
+        grid.appendChild(cell);
+      }
+
+      document.getElementById('cal-title-text').innerText =
+        `${year}년 ${month}월`;
+    }
+
+    function selectCalDay(day, element) {
+      calState.selectedDay = day;
+      document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+      if (element) element.classList.add('selected');
+
+      const dateKey = `${calState.year}-${String(calState.month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const events = CALENDAR_EVENTS_DB[dateKey] || [];
+      const headerEl = document.getElementById('calendar-events-header');
+      const listEl = document.getElementById('calendar-events-list');
+
+      // 요구사항: 해당 날짜에 일정이 없을 시 빈 화면 나타나며 예정 일정 (0건)으로 표기
+      headerEl.innerText = `${dateKey} 예정 일정 (${events.length}건)`;
+
+      if (events.length === 0) {
+        listEl.innerHTML = `
+          <div class="card" style="text-align:center; padding:44px 20px; border:1px dashed var(--border); animation: fadeIn 0.25s ease;">
+            <div style="width:50px; height:50px; border-radius:25px; background:var(--surface-high); display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+              <i class="fa-regular fa-calendar-xmark" style="font-size:22px; color:var(--text-disabled);"></i>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">예정된 팬덤 일정이 없습니다</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+              ${calState.month}월 ${day}일에는 등록된 공식 행사가 없습니다.<br/>새로운 무대인사나 GV 소식이 있다면 제보해주세요!
+            </div>
+            <button class="btn btn-primary" onclick="openReportEventModal()" style="font-size:12px; min-height:36px; padding:6px 16px; margin:0 auto; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-calendar-plus"></i> ${day}일 일정 직접 제보하기
+            </button>
+          </div>
+        `;
+        triggerToast(`${dateKey}에는 예정된 일정이 없습니다 (0건)`);
+      } else {
+        let html = '';
+        events.forEach(ev => {
+          html += `
+            <div class="card event-item" data-person="${ev.personAttr}" data-role="${ev.roleAttr}" style="animation: fadeIn 0.25s ease; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="display:flex; gap:6px;">
+                  <span style="font-size:11px; background:${ev.badgeBg}; color:${ev.badgeColor}; padding:3px 8px; border-radius:4px; font-weight:700;">
+                    ${ev.type}
+                  </span>
+                  <span style="font-size:11px; background:var(--surface-high); color:var(--text-secondary); padding:3px 8px; border-radius:4px; font-weight:600;">
+                    <i class="fa-solid fa-user-tie"></i> ${ev.person}
+                  </span>
+                </div>
+                <button class="btn btn-secondary" style="min-height:30px; padding:2px 10px; font-size:11px;" onclick="triggerToast('알림이 등록되었습니다.')">
+                  <i class="fa-solid fa-bell" style="color:var(--accent);"></i> 알림
+                </button>
+              </div>
+              <h4 style="font-size:15px; font-weight:700; margin-bottom:6px;">${ev.title}</h4>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:3px;">
+                <i class="fa-regular fa-clock"></i> ${ev.time}
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                <i class="fa-solid fa-location-dot"></i> ${ev.location}
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">
+                공식 출처: ${ev.source}
+              </div>
+              <button class="btn btn-primary" style="width:100%; min-height:40px; font-size:13px;" onclick="triggerToast('${ev.ticketVendor} 예매처로 이동합니다.')">
+                공식 예매처 이동 (${ev.ticketVendor}) <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </button>
+            </div>
+          `;
+        });
+        listEl.innerHTML = html;
+        triggerToast(`${dateKey} 일정 ${events.length}건을 불러왔습니다.`);
+      }
+    }
+
+    function changeCalMonth(delta) {
+      calState.month += delta;
+      if (calState.month > 12) { calState.month = 1; calState.year++; }
+      if (calState.month < 1)  { calState.month = 12; calState.year--; }
+      renderCalGrid();
+      triggerToast(`${calState.year}년 ${calState.month}월 캘린더로 이동했습니다.`);
+    }
+
+    function goToToday() {
+      const now = new Date();
+      calState.year = now.getFullYear();
+      calState.month = now.getMonth() + 1;
+      renderCalGrid();
+      triggerToast('오늘 날짜로 이동했습니다.');
+    }
+
+    // ── Picker Dropdown ───────────────────────────────────────────────
+    function toggleCalPicker() {
+      calPickerOpen = !calPickerOpen;
+      const picker = document.getElementById('cal-picker');
+      if (calPickerOpen) {
+        pickerState.year = calState.year;
+        renderPickerYear();
+        picker.style.display = 'block';
+      } else {
+        picker.style.display = 'none';
+      }
+    }
+
+    function renderPickerYear() {
+      document.getElementById('picker-year-label').innerText = pickerState.year + '년';
+      const grid = document.getElementById('picker-month-grid');
+      grid.innerHTML = '';
+      const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+      months.forEach((m, i) => {
+        const btn = document.createElement('button');
+        const isActive = pickerState.year === calState.year && (i + 1) === calState.month;
+        btn.innerText = m;
+        btn.style.cssText = `background:${isActive ? 'var(--accent)' : 'var(--surface-high)'}; color:${isActive ? '#fff' : 'var(--text-primary)'}; border:none; border-radius:8px; padding:8px 4px; font-size:12px; font-weight:${isActive ? '700' : '400'}; cursor:pointer; transition:background 0.15s;`;
+        btn.onmouseover = () => { if (!isActive) btn.style.background = 'var(--border)'; };
+        btn.onmouseout  = () => { if (!isActive) btn.style.background = 'var(--surface-high)'; };
+        btn.onclick = () => {
+          calState.year = pickerState.year;
+          calState.month = i + 1;
+          renderCalGrid();
+          toggleCalPicker();
+          triggerToast(`${calState.year}년 ${calState.month}월 캘린더로 이동했습니다.`);
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function changePickerYear(delta) {
+      pickerState.year += delta;
+      renderPickerYear();
+    }
+
+    // close picker when clicking outside
+    document.addEventListener('click', (e) => {
+      if (calPickerOpen &&
+          !e.target.closest('#cal-picker') &&
+          !e.target.closest('#cal-title-btn')) {
+        calPickerOpen = false;
+        document.getElementById('cal-picker').style.display = 'none';
+      }
+    });
+
+    // init on load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCalGrid();
+    });
+
+    // Calendar Filtering by Role & Person (2. 캘린더)
+    function setCalendarRoleFilter(role, el) {
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+
+      document.querySelectorAll('.event-item').forEach(item => {
+        if (role === 'all' || item.dataset.role.includes(role)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      triggerToast(role === 'all' ? '전체 일정을 표시합니다.' : (role === 'actor' ? '배우별 스케줄을 필터링했습니다.' : '감독별 스케줄을 필터링했습니다.'));
+    }
+
+    function filterCalendarByPerson(person, el) {
+      document.querySelectorAll('.event-item').forEach(item => {
+        if (item.dataset.person.includes(person)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      triggerToast(`${person} 관련 스케줄을 필터링했습니다.`);
+    }
+
+
+
+    // Explore Tab (3. 탐색: 익명 DB & 1-Click 서랍 저장)
+    function setExploreFilter(emotion, el) {
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+
+      document.querySelectorAll('.explore-item').forEach(item => {
+        if (emotion === 'all' || item.dataset.emotion === emotion) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    let scrapedCount = 1;
+    function scrapExploreScene(btn, work, quote, stillUrl, ep, tm, emotion, character) {
+      if (btn.classList.contains('scraped-done')) {
+        triggerToast('이미 내 서랍에 보관된 명장면입니다.');
+        return;
+      }
+
+      btn.classList.add('scraped-done');
+      btn.style.background = 'var(--surface-high)';
+      btn.style.color = 'var(--text-secondary)';
+      btn.style.border = '1px solid var(--border)';
+      btn.innerHTML = '<i class="fa-solid fa-check" style="color:var(--accent);"></i> 서랍에 보관됨';
+
+      // Clone into Tab 4 (서랍 - 탐색에서 스크랩한 장면)
+      scrapedCount++;
+      document.getElementById('scraped-records-count').innerText = scrapedCount;
+
+      const scrapedList = document.getElementById('scraped-cards-list');
+      const cardHtml = `
+        <div class="card scraped-item" data-emotion="${emotion}" style="animation: slideUp 0.3s ease-out; border-left: 3px solid var(--accent);">
+          <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
+            <img src="${stillUrl}" style="width:100%; height:100%; object-fit:cover;" />
+            <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+              <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">${ep} ${tm}</span>
+              <span style="background:rgba(233,139,38,0.9); font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">스크랩됨</span>
+            </div>
+            <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#${emotion}</div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${work} • ${character}</div>
+          <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
+            "${quote}"
+          </div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
+            [익명 탐색 아카이브 스크랩] 마음에 드는 장면으로 내 서랍에 추가 보관되었습니다.
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+            <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('연동 OTT 앱에서 바로 재생합니다.')">
+              <i class="fa-solid fa-play" style="color:var(--accent);"></i> OTT에서 보기
+            </button>
+            <div style="display:flex; gap:14px;">
+              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${work}', '${quote.replace(/'/g, "\\'")}')"></i>
+              <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="this.closest('.card').remove(); triggerToast('스크랩이 삭제되었습니다.');"></i>
+            </div>
+          </div>
+        </div>
+      `;
+      scrapedList.insertAdjacentHTML('afterbegin', cardHtml);
+
+      triggerToast('🎉 내 서랍(탐색 스크랩)에 저장되었습니다!');
+    }
+
+    // Drawer 2-Area Toggle (4. 서랍: 내가 기록한 장면 vs 탐색에서 스크랩한 장면)
+    function switchArchiveSection(sec) {
+      if (sec === 'my') {
+        document.getElementById('btn-seg-my').classList.add('active');
+        document.getElementById('btn-seg-scraped').classList.remove('active');
+        document.getElementById('archive-section-my').style.display = 'block';
+        document.getElementById('archive-section-scraped').style.display = 'none';
+        document.getElementById('archive-header-subtitle').innerText = '내가 직접 기록한 명장면 서랍';
+      } else {
+        document.getElementById('btn-seg-my').classList.remove('active');
+        document.getElementById('btn-seg-scraped').classList.add('active');
+        document.getElementById('archive-section-my').style.display = 'none';
+        document.getElementById('archive-section-scraped').style.display = 'block';
+        document.getElementById('archive-header-subtitle').innerText = '탐색 DB에서 스크랩하여 모은 명장면';
+      }
+    }
+
+    function setArchiveFilter(emotion, el) {
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.querySelectorAll('#archive-section-my .archive-item').forEach(item => {
+        if (emotion === 'all' || item.dataset.emotion === emotion) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Scene Archive Add Modal Logic (공개/비공개 옵션 포함)
+    let cardIsPublic = true;
+    let selectedCardStillUrl = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600';
+    let selectedCardWork = '달빛이 머무는 밤';
+    let selectedCardEmotion = '설레는';
+    let totalMyArchiveCount = 10;
+
+    function setCardPrivacy(isPub) {
+      cardIsPublic = isPub;
+      if (isPub) {
+        document.getElementById('priv-public-btn').classList.add('active');
+        document.getElementById('priv-private-btn').classList.remove('active');
+        document.getElementById('priv-helper-text').innerText = '공개 시 탐색 탭의 익명 DB에 공유되어 다른 이용자가 감상하고 스크랩할 수 있습니다 (프로필은 노출되지 않습니다).';
+      } else {
+        document.getElementById('priv-public-btn').classList.remove('active');
+        document.getElementById('priv-private-btn').classList.add('active');
+        document.getElementById('priv-helper-text').innerText = '비공개 시 오직 내 서랍에만 보관되며, 탐색 DB에 노출되지 않습니다.';
+      }
+    }
+
+    function selectCardStill(url, label, el) {
+      selectedCardStillUrl = url;
+      document.getElementById('new-card-still-preview').src = url;
+      document.getElementById('still-selected-label').innerText = label;
+      document.querySelectorAll('.still-select-thumb').forEach(t => {
+        t.style.borderColor = 'var(--border)';
+      });
+      el.style.borderColor = 'var(--accent)';
+    }
+
+    function selectCardWork(work, el) {
+      selectedCardWork = work;
+    }
+
+    // ── OTT 연동 작품 통합 데이터베이스 (TVING & Wavve) ───────────────────
+    const OTT_WORKS_CATALOG = [
+      { id: 'work-1', title: '달빛이 머무는 밤', ott: 'TVING', ottColor: '#FF143C', genre: '로맨스 판타지 • 16부작', stillUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600', stillName: '남산 야경 명장면' },
+      { id: 'work-2', title: '너와 나의 시그널', ott: 'Wavve', ottColor: '#0075FF', genre: 'SF 타임슬립 • 12부작', stillUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600', stillName: '을지로 네온 골목' },
+      { id: 'work-3', title: '청춘의 파도', ott: 'TVING', ottColor: '#FF143C', genre: '청춘 멜로 • 영화', stillUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', stillName: '강릉 파도 해변' },
+      { id: 'work-4', title: '마지막 오케스트라', ott: 'Wavve', ottColor: '#0075FF', genre: '감동 휴먼 • 영화', stillUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600', stillName: '오케스트라 무대' },
+      { id: 'work-5', title: '도심의 불빛', ott: 'TVING', ottColor: '#FF143C', genre: '느와르 액션 • 8부작', stillUrl: 'https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600', stillName: '마포대교 야경' }
+    ];
+
+    // 1. 장소 등록 모달 내 OTT 작품 검색
+    function searchSpotWork(query) {
+      const dropdown = document.getElementById('spot-work-dropdown');
+      if (!dropdown) return;
+      const q = (query || '').trim().toLowerCase();
+      const filtered = q === '' 
+        ? OTT_WORKS_CATALOG 
+        : OTT_WORKS_CATALOG.filter(w => w.title.toLowerCase().includes(q) || w.ott.toLowerCase().includes(q) || w.genre.toLowerCase().includes(q));
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `<div style="padding:12px; font-size:12px; color:var(--text-secondary); text-align:center;">일치하는 OTT 연동 작품이 없습니다.</div>`;
+        dropdown.style.display = 'block';
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(item => {
+        html += `
+          <div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+               onmouseover="this.style.background='var(--surface-high)'" onmouseout="this.style.background='transparent'"
+               onclick="selectSpotWork('${item.title}', '${item.ott}', '${item.ottColor}')">
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--text-primary);">${item.title}</div>
+              <div style="font-size:11px; color:var(--text-secondary);">${item.genre}</div>
+            </div>
+            <span style="font-size:10px; background:${item.ottColor}; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">${item.ott}</span>
+          </div>
+        `;
+      });
+      dropdown.innerHTML = html;
+      dropdown.style.display = 'block';
+    }
+
+    function selectSpotWork(title, ott, ottColor) {
+      document.getElementById('new-spot-work').value = title;
+      document.getElementById('spot-work-dropdown').style.display = 'none';
+      const tag = document.getElementById('new-spot-selected-tag');
+      const label = document.getElementById('new-spot-selected-label');
+      label.innerHTML = `<span style="background:${ottColor}; color:#fff; font-size:10px; padding:1px 6px; border-radius:3px; margin-right:6px; font-weight:700;">${ott}</span> ${title} (연동됨)`;
+      tag.style.display = 'flex';
+      triggerToast(`OTT 연동 작품 [${ott}] ${title} 선택 완료`);
+    }
+
+    function clearSpotWorkSelection() {
+      document.getElementById('new-spot-work').value = '';
+      document.getElementById('new-spot-selected-tag').style.display = 'none';
+    }
+
+    // 2. 장면 기록 모달 내 OTT 작품 검색
+    function searchCardWork(query) {
+      const dropdown = document.getElementById('card-work-dropdown');
+      if (!dropdown) return;
+      const q = (query || '').trim().toLowerCase();
+      const filtered = q === '' 
+        ? OTT_WORKS_CATALOG 
+        : OTT_WORKS_CATALOG.filter(w => w.title.toLowerCase().includes(q) || w.ott.toLowerCase().includes(q) || w.genre.toLowerCase().includes(q));
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `<div style="padding:12px; font-size:12px; color:var(--text-secondary); text-align:center;">일치하는 OTT 연동 작품이 없습니다.</div>`;
+        dropdown.style.display = 'block';
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(item => {
+        html += `
+          <div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
+               onmouseover="this.style.background='var(--surface-high)'" onmouseout="this.style.background='transparent'"
+               onclick="selectCardWorkItem('${item.title}', '${item.ott}', '${item.ottColor}', '${item.stillUrl}', '${item.stillName}')">
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--text-primary);">${item.title}</div>
+              <div style="font-size:11px; color:var(--text-secondary);">${item.genre}</div>
+            </div>
+            <span style="font-size:10px; background:${item.ottColor}; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">${item.ott}</span>
+          </div>
+        `;
+      });
+      dropdown.innerHTML = html;
+      dropdown.style.display = 'block';
+    }
+
+    function selectCardWorkItem(title, ott, ottColor, stillUrl, stillName) {
+      selectedCardWork = title;
+      document.getElementById('card-selected-work-val').value = title;
+      document.getElementById('card-work-search-input').value = title;
+      document.getElementById('card-work-dropdown').style.display = 'none';
+
+      // 뱃지 및 표시 업데이트
+      const ottBadge = document.getElementById('card-work-ott-badge');
+      ottBadge.innerText = ott;
+      ottBadge.style.background = ottColor;
+      document.getElementById('card-work-title-display').innerText = title;
+      document.getElementById('card-selected-work-box').style.display = 'flex';
+
+      // 스틸컷 프리뷰도 해당 작품 대표컷으로 스마트 변경
+      if (stillUrl) {
+        selectCardStill(stillUrl, stillName, document.querySelector('.still-select-thumb'));
+      }
+      triggerToast(`OTT 연동 작품 [${ott}] ${title}을(를) 선택했습니다.`);
+    }
+
+    function focusCardWorkInput() {
+      const input = document.getElementById('card-work-search-input');
+      input.value = '';
+      input.focus();
+      searchCardWork('');
+    }
+
+    // 바깥 클릭 시 드롭다운 닫기
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#spot-work-dropdown') && !e.target.closest('#new-spot-work')) {
+        const d = document.getElementById('spot-work-dropdown');
+        if (d) d.style.display = 'none';
+      }
+      if (!e.target.closest('#card-work-dropdown') && !e.target.closest('#card-work-search-input')) {
+        const d = document.getElementById('card-work-dropdown');
+        if (d) d.style.display = 'none';
+      }
+    });
+
+    function selectCardEmotion(emotion, el) {
+      selectedCardEmotion = emotion;
+      document.querySelectorAll('#card-emotion-chips .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('preview-badge-emo').innerText = '#' + emotion;
+    }
+
+    function updateCardBadgePreview() {
+      const ep = document.getElementById('new-card-episode').value.trim() || '12화';
+      const tm = document.getElementById('new-card-time').value.trim() || '34:21';
+      document.getElementById('preview-badge-ep').innerText = ep + ' ' + tm;
+    }
+
+    function submitNewArchiveCard() {
+      const quote = document.getElementById('new-card-quote').value.trim();
+      if (!quote) {
+        triggerToast('명대사를 입력해주세요!');
+        document.getElementById('new-card-quote').focus();
+        return;
+      }
+      const ep = document.getElementById('new-card-episode').value.trim() || '12화';
+      const tm = document.getElementById('new-card-time').value.trim() || '34:21';
+      const character = document.getElementById('new-card-character').value.trim() || '차은호';
+      const memo = document.getElementById('new-card-memo').value.trim();
+      const workValEl = document.getElementById('card-selected-work-val');
+      const work = (workValEl && workValEl.value.trim()) || selectedCardWork || '달빛이 머무는 밤';
+      const emotion = selectedCardEmotion;
+      const stillUrl = selectedCardStillUrl;
+      const isPub = cardIsPublic;
+
+      const cardsContainer = document.getElementById('archive-cards-list');
+      const cardHtml = `
+        <div class="card archive-item" data-emotion="${emotion}" style="animation: slideUp 0.3s ease-out; border-left: 3px solid var(--accent);">
+          <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
+            <img src="${stillUrl}" style="width:100%; height:100%; object-fit:cover;" />
+            <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+              <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">${ep} ${tm}</span>
+              <span style="background:${isPub ? 'rgba(16,185,129,0.9)' : 'rgba(110,103,95,0.9)'}; font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">${isPub ? '공개' : '비공개'}</span>
+            </div>
+            <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#${emotion}</div>
+          </div>
+          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${work} • ${character}</div>
+          <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
+            "${quote}"
+          </div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
+            ${memo || '기록된 감상 메모가 없습니다.'}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+            <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('TVING 앱에서 해당 시점으로 바로 재생합니다.')">
+              <i class="fa-solid fa-play" style="color:var(--accent);"></i> TVING에서 보기
+            </button>
+            <div style="display:flex; gap:14px;">
+              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${work}', '${quote.replace(/'/g, "\\'")}')"></i>
+              <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="this.closest('.card').remove(); triggerToast('장면이 서랍에서 삭제되었습니다.');"></i>
+            </div>
+          </div>
+        </div>
+      `;
+
+      cardsContainer.insertAdjacentHTML('afterbegin', cardHtml);
+      totalMyArchiveCount++;
+      document.getElementById('my-records-count').innerText = totalMyArchiveCount;
+      document.getElementById('prof-saved-count').innerText = totalMyArchiveCount;
+
+      // If public, also optionally add to explore DB
+      if (isPub) {
+        const exploreContainer = document.getElementById('explore-cards-list');
+        const expHtml = `
+          <div class="card explore-item" data-emotion="${emotion}" style="animation: slideUp 0.3s ease-out; border-left: 3px solid var(--accent);">
+            <div style="height:170px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:12px;">
+              <img src="${stillUrl}" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; top:8px; left:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">
+                <i class="fa-solid fa-eye-slash"></i> 익명 DB
+              </div>
+              <div style="position:absolute; top:8px; right:8px; background:var(--accent); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">
+                #${emotion}
+              </div>
+              <div style="position:absolute; bottom:8px; right:8px; background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 6px; border-radius:4px;">
+                ${ep} ${tm}
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:13px; font-weight:700; color:var(--text-primary);">${work}</span>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">인물: ${character}</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary); font-style:italic; margin-bottom:6px; line-height:20px;">
+              "${quote}"
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">
+              ${memo || '익명으로 공유된 감동적인 명장면입니다.'}
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
+              <span style="font-size:11px; color:var(--text-muted);">#명장면 #익명공유</span>
+              <button class="btn btn-secondary scraped-done" style="min-height:34px; padding:4px 12px; font-size:12px;">
+                <i class="fa-solid fa-check" style="color:var(--accent);"></i> 서랍에 보관됨
+              </button>
+            </div>
+          </div>
+        `;
+        exploreContainer.insertAdjacentHTML('afterbegin', expHtml);
+      }
+
+      // Reset & Close
+      document.getElementById('new-card-quote').value = '';
+      document.getElementById('new-card-memo').value = '';
+      closeModal('add-card-modal');
+      triggerToast(isPub ? '🎉 새 명장면이 서랍에 저장되었으며, 익명 탐색 DB에 공유되었습니다!' : '🔒 새 명장면이 비공개로 안전하게 서랍에 보관되었습니다.');
+    }
+
+    // Map Pin selection & Certifications
+    const mapLocations = [
+      {
+        title: '남산 백범광장 공원 성곽길',
+        address: '서울특별시 중구 회현동1가 100-115',
+        work: '달빛이 머무는 밤 • 12화',
+        desc: '두 주인공이 천년 만에 재회하며 서로의 전생 기억을 확인하는 애틋한 장면의 배경지입니다.',
+        img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600',
+        lat: 37.5539,
+        lng: 126.9798
+      },
+      {
+        title: '조경철천문대',
+        address: '강원도 화천군 사내면 천문대길 453',
+        work: '달빛이 머무는 밤 • 4화',
+        desc: '별빛 아래서 주인공들이 은하수를 바라보며 첫 마음을 고백하던 신비로운 천문대.',
+        img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600',
+        lat: 38.0125,
+        lng: 127.4891
+      },
+      {
+        title: '을지로 인쇄소 골목',
+        address: '서울특별시 중구 충무로 29',
+        work: '네온 사일런스 • 영화 01:23:10',
+        desc: '비에 젖은 네온사인 조명 아래 잠입 요원이 추격전을 벌이던 긴박한 골목길.',
+        img: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600',
+        lat: 37.5662,
+        lng: 126.9921
+      },
+      {
+        title: '양양 서피비치',
+        address: '강원도 양양군 현북면 하조대해안길 119',
+        work: '청춘의 파도 • 12화',
+        desc: '청춘들이 서핑 대회를 마치고 석양을 바라보며 서로의 꿈을 응원하는 엔딩 장소.',
+        img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
+        lat: 38.0267,
+        lng: 128.7183
+      }
+    ];
+
+    // ── Kakao Maps API Dynamic Loader (보안 원칙: API 키 하드코딩 절대 금지) ──
+    let kakaoMapInstance = null;
+    let kakaoMarkers = [];
+
+    function checkKakaoApiKey() {
+      const key = (typeof window !== 'undefined' && window.__ENV__ && window.__ENV__.KAKAO_MAP_KEY) ||
+                  (typeof window !== 'undefined' && window.EXPO_PUBLIC_KAKAO_MAP_KEY) ||
+                  '';
+      
+      const isConfigured = key && key.trim() !== '' && !key.includes('여기에_자바스크립트_키_입력');
+      return { isConfigured, key };
+    }
+
+    function initKakaoMap() {
+      const { isConfigured, key } = checkKakaoApiKey();
+
+      // [안전장치]: 환경변수가 비어있거나 플레이스홀더일 때 앱 중단 없이 콘솔 경고 및 안내
+      if (!isConfigured) {
+        console.warn(
+          '%c[SceneIn - Kakao Maps 보안 연동 안내]%c\n' +
+          '카카오맵 JavaScript API 키가 설정되지 않았습니다.\n' +
+          '보안을 위해 API 키는 소스코드에 하드코딩되지 않으며, 프로젝트 루트의 .env 파일에서 관리됩니다.\n\n' +
+          '▶ 설정 방법:\n' +
+          '  1. 루트 .env 파일 열기\n' +
+          '  2. EXPO_PUBLIC_KAKAO_MAP_KEY="발급받은_키" 입력\n' +
+          '  3. 카카오디벨로퍼스(https://developers.kakao.com) 웹 플랫폼 등록 주소:\n' +
+          '     - http://localhost:8081\n' +
+          '     - http://localhost:3000',
+          'color:#E98B26; font-weight:bold; font-size:12px;',
+          'color:inherit;'
+        );
+        return;
+      }
+
+      // API 키가 설정되었을 때 카카오맵 SDK 동적 로드
+      if (window.kakao && window.kakao.maps) {
+        window.kakao.maps.load(buildKakaoMap);
+      } else {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&autoload=false`;
+        script.async = true;
+        script.onload = () => {
+          if (window.kakao && window.kakao.maps) {
+            window.kakao.maps.load(buildKakaoMap);
+          }
+        };
+        script.onerror = () => {
+          console.error('[KakaoMap] 카카오맵 SDK 로드 실패: 등록된 플랫폼 도메인을 확인하세요.');
+        };
+        document.head.appendChild(script);
+      }
+    }
+
+    function buildKakaoMap() {
+      const mapContainer = document.getElementById('kakao-map-real-container');
+      if (!mapContainer) return;
+
+      mapContainer.style.display = 'block';
+      const statusPill = document.getElementById('kakao-map-status-pill');
+      const statusText = document.getElementById('kakao-map-status-text');
+      if (statusText) statusText.innerText = 'Kakao Maps 실시간 지도';
+      if (statusPill) statusPill.style.background = 'rgba(255,255,255,0.95)';
+
+      const options = {
+        center: new window.kakao.maps.LatLng(37.5539, 126.9798),
+        level: 6
+      };
+
+      kakaoMapInstance = new window.kakao.maps.Map(mapContainer, options);
+
+      // 마커 등록
+      kakaoMarkers.forEach(m => m.setMap(null));
+      kakaoMarkers = [];
+
+      mapLocations.forEach((loc, idx) => {
+        const markerPosition = new window.kakao.maps.LatLng(loc.lat, loc.lng);
+        const marker = new window.kakao.maps.Marker({
+          position: markerPosition,
+          title: loc.title
+        });
+        marker.setMap(kakaoMapInstance);
+
+        window.kakao.maps.event.addListener(marker, 'click', () => {
+          selectMapPin(idx);
+          kakaoMapInstance.panTo(markerPosition);
+        });
+
+        kakaoMarkers.push(marker);
+      });
+
+      console.info('[KakaoMap] 카카오맵이 성공적으로 활성화되었습니다.');
+    }
+
+    function toggleKakaoMapInfo() {
+      const { isConfigured } = checkKakaoApiKey();
+      if (!isConfigured) {
+        triggerToast('🔑 .env 파일에 EXPO_PUBLIC_KAKAO_MAP_KEY를 입력하면 카카오맵이 활성화됩니다!');
+      } else {
+        triggerToast('🗺️ 카카오맵 실시간 연동이 정상 작동 중입니다.');
+      }
+    }
+
+    // 페이지 로드 시 카카오맵 초기화 시도
+    document.addEventListener('DOMContentLoaded', () => {
+      initKakaoMap();
+    });
+
+    function selectMapPin(index, el) {
+      document.querySelectorAll('.pin-marker').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      const loc = mapLocations[index];
+      if (loc) {
+        document.getElementById('map-loc-title').innerText = loc.title;
+        document.getElementById('map-loc-addr').innerHTML = '<i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> ' + loc.address;
+        document.getElementById('map-loc-desc').innerText = loc.desc;
+        document.getElementById('map-work-badge').innerText = loc.work;
+        document.getElementById('map-still-img').src = loc.img;
+      }
+    }
+
+    function filterMapByWork(workId, el) {
+      el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      triggerToast('해당 작품의 촬영지 핀을 표시합니다.');
+    }
+
+    function saveLocationToArchive() {
+      triggerToast('촬영지 정보가 명장면 서랍에 저장되었습니다.');
+    }
+
+    function completeCertification() {
+      closeModal('cert-modal');
+      triggerToast('🏆 축하합니다! 디지털 스탬프를 획득하셨습니다.');
+    }
+
+    function applyShareTemplate(tpl) {
+      const card = document.getElementById('share-preview-card');
+      if (tpl === 'minimal') {
+        card.style.background = '#33302C';
+        card.style.borderColor = 'var(--accent)';
+      } else if (tpl === 'filmstrip') {
+        card.style.background = '#211F1D';
+        card.style.borderColor = '#555';
+      } else if (tpl === 'neon') {
+        card.style.background = '#1A1816';
+        card.style.borderColor = 'var(--accent)';
+      } else if (tpl === 'editorial') {
+        card.style.background = '#F0ECE5';
+        card.style.borderColor = '#D8D1C5';
+        card.style.color = '#33302C';
+      } else if (tpl === 'polaroid') {
+        card.style.background = '#FFFDFC';
+        card.style.borderColor = '#E3DDD4';
+        card.style.color = '#33302C';
+      }
+      triggerToast(tpl + ' 템플릿이 적용되었습니다.');
+    }
+  </script>
+</body>
+</html>
