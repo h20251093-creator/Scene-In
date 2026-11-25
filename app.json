@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "SCENE-IN",
+    "slug": "scene-in",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "scenein",
+    "newArchEnabled": false,
+    "splash": {
+      "backgroundColor": "#0C1224"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.scenein.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "촬영지 방문 인증 및 주변 촬영지 탐색을 위해 현재 위치 권한이 필요합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0C1224"
+      },
+      "package": "com.scenein.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "촬영지 방문 인증 및 주변 촬영지 탐색을 위해 현재 위치 권한이 필요합니다."
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
