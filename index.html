@@ -1782,11 +1782,113 @@
     .explore-filter-drawer {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 18px;
+      border-radius: 18px;
+      padding: 20px 22px;
       margin-top: 10px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
       animation: slideDown 0.25s ease-out;
+    }
+
+    .explore-filter-group + .explore-filter-group {
+      margin-top: 18px;
+    }
+
+    .explore-filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 12px;
+    }
+
+    .explore-filter-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .explore-filter-label i {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .explore-filter-reset-btn {
+      background: transparent;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .explore-filter-reset-btn:hover,
+    .explore-filter-reset-btn:focus-visible {
+      background: var(--accent-subtle);
+      color: var(--accent-hover);
+      outline: none;
+    }
+
+    .explore-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .explore-opt-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 7px 14px;
+      min-height: 34px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .explore-opt-chip:hover {
+      background: var(--bg-subtle);
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    .explore-opt-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+
+    .explore-opt-chip.active i {
+      color: #FFFFFF !important;
+    }
+
+    @media (max-width: 480px) {
+      .explore-filter-drawer {
+        padding: 16px;
+        border-radius: 16px;
+      }
+      .explore-opt-chip {
+        padding: 6px 12px;
+        min-height: 32px;
+        font-size: 11.5px;
+      }
     }
 
     @keyframes slideDown {
@@ -2788,33 +2890,33 @@
           <!-- 2. Interactive Filter Drawer (검색탭 선택 시 여러 필터 노출) -->
           <div class="explore-filter-drawer" id="explore-filter-panel" style="display:none;">
             <!-- OTT 플랫폼 필터 (티빙 & 웨이브) -->
-            <div style="margin-bottom:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:11px; font-weight:700; color:var(--text-secondary);"><i class="fa-solid fa-tv"
-                    style="color:var(--accent);"></i> 방영 OTT 플랫폼</span>
-                <span style="font-size:10px; color:var(--accent); font-weight:600; cursor:pointer;"
-                  onclick="resetExploreFilters()">필터 초기화</span>
+            <div class="explore-filter-group">
+              <div class="explore-filter-header">
+                <span class="explore-filter-label"><i class="fa-solid fa-tv"></i> 방영 OTT 플랫폼</span>
+                <button type="button" class="explore-filter-reset-btn" onclick="resetExploreFilters()">
+                  <i class="fa-solid fa-rotate-right"></i> 필터 초기화
+                </button>
               </div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <div class="explore-filter-chips">
                 <span class="chip explore-opt-chip active" data-type="ott" data-val="all"
                   onclick="selectExploreFilterOpt('ott', 'all', this)">전체 OTT</span>
                 <span class="chip explore-opt-chip" data-type="ott" data-val="TVING"
-                  onclick="selectExploreFilterOpt('ott', 'TVING', this)" style="border-left:3px solid #FF143C;">
+                  onclick="selectExploreFilterOpt('ott', 'TVING', this)">
                   <i class="fa-solid fa-play" style="color:#FF143C; font-size:10px;"></i> TVING (티빙)
                 </span>
                 <span class="chip explore-opt-chip" data-type="ott" data-val="Wavve"
-                  onclick="selectExploreFilterOpt('ott', 'Wavve', this)" style="border-left:3px solid #0075FF;">
+                  onclick="selectExploreFilterOpt('ott', 'Wavve', this)">
                   <i class="fa-solid fa-water" style="color:#0075FF; font-size:10px;"></i> Wavve (웨이브)
                 </span>
               </div>
             </div>
 
             <!-- 감정 태그 필터 -->
-            <div style="margin-bottom:12px;">
-              <span
-                style="font-size:11px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;"><i
-                  class="fa-solid fa-heart" style="color:var(--accent);"></i> 장면 감정 분위기</span>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div class="explore-filter-group">
+              <div class="explore-filter-header">
+                <span class="explore-filter-label"><i class="fa-solid fa-heart"></i> 장면 감정 분위기</span>
+              </div>
+              <div class="explore-filter-chips">
                 <span class="chip explore-opt-chip active" data-type="emotion" data-val="all"
                   onclick="selectExploreFilterOpt('emotion', 'all', this)">전체 감정</span>
                 <span class="chip explore-opt-chip" data-type="emotion" data-val="설레는"
@@ -2835,11 +2937,11 @@
             </div>
 
             <!-- 콘텐츠 유형 필터 -->
-            <div>
-              <span
-                style="font-size:11px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;"><i
-                  class="fa-solid fa-film" style="color:var(--accent);"></i> 콘텐츠 유형</span>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div class="explore-filter-group">
+              <div class="explore-filter-header">
+                <span class="explore-filter-label"><i class="fa-solid fa-film"></i> 콘텐츠 유형</span>
+              </div>
+              <div class="explore-filter-chips">
                 <span class="chip explore-opt-chip active" data-type="type" data-val="all"
                   onclick="selectExploreFilterOpt('type', 'all', this)">전체 유형</span>
                 <span class="chip explore-opt-chip" data-type="type" data-val="drama"
