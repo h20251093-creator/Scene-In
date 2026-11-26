@@ -2536,45 +2536,11 @@
           </button>
         </header>
 
-        <!-- Category Filter Chips (촬영지 / 팝업스토어 / 시사회) -->
-        <div class="chip-scroll" style="padding-bottom:4px;">
-          <div class="chip active map-cat-chip" onclick="filterMapCategory('all', this)">
-            <i class="fa-solid fa-layer-group"></i> 전체 장소 (<span id="map-total-count">8</span>)
-          </div>
-          <div class="chip map-cat-chip" onclick="filterMapCategory('spot', this)"
-            style="border-left:3px solid var(--accent);">
-            <i class="fa-solid fa-clapperboard" style="color:var(--accent);"></i> 공식 촬영지
-          </div>
-          <div class="chip map-cat-chip" onclick="filterMapCategory('popup', this)"
-            style="border-left:3px solid #E11D48;">
-            <i class="fa-solid fa-store" style="color:#E11D48;"></i> 작품 팝업스토어
-          </div>
-          <div class="chip map-cat-chip" onclick="filterMapCategory('premiere', this)"
-            style="border-left:3px solid #7C3AED;">
-            <i class="fa-solid fa-ticket" style="color:#7C3AED;"></i> 시사회·무대인사관
-          </div>
-        </div>
-
-        <!-- Work Sub Filter Chips -->
-        <div
-          style="padding: 6px 20px 10px 20px; display:flex; gap:6px; overflow-x:auto; background:var(--bg-subtle); border-bottom:1px solid var(--border);">
-          <span class="chip map-work-chip active" style="font-size:11px; min-height:28px; padding:2px 10px;"
-            onclick="filterMapByWork('all', this)">전체 작품</span>
-          <span class="chip map-work-chip" style="font-size:11px; min-height:28px; padding:2px 10px;"
-            onclick="filterMapByWork('달빛이 머무는 밤', this)">달빛이 머무는 밤</span>
-          <span class="chip map-work-chip" style="font-size:11px; min-height:28px; padding:2px 10px;"
-            onclick="filterMapByWork('너와 나의 시그널', this)">너와 나의 시그널</span>
-          <span class="chip map-work-chip" style="font-size:11px; min-height:28px; padding:2px 10px;"
-            onclick="filterMapByWork('청춘의 파도', this)">청춘의 파도</span>
-          <span class="chip map-work-chip" style="font-size:11px; min-height:28px; padding:2px 10px;"
-            onclick="filterMapByWork('네온 사일런스', this)">네온 사일런스</span>
-        </div>
-
-        <!-- 한국문화정보원 전국 촬영지 DB 검색 바 -->
-        <div style="padding: 10px 20px 4px 20px;">
+        <!-- 한국문화정보원 전국 촬영지 DB 검색 바 + 포커스 시 노출되는 필터 -->
+        <div id="map-search-wrap" style="padding: 10px 20px 8px 20px;">
           <div style="display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px 12px;">
             <i class="fa-solid fa-magnifying-glass" style="color:var(--accent); font-size:13px;"></i>
-            <input type="text" id="map-csv-search-input" oninput="onMapCsvSearch(this.value)"
+            <input type="text" id="map-csv-search-input" onfocus="openMapFilterPanel()" onclick="openMapFilterPanel()" oninput="onMapCsvSearch(this.value)"
               placeholder="작품명, 촬영지명, 지역 주소로 15,034개 촬영지 검색..."
               style="flex:1; border:none; background:transparent; font-size:12px; color:var(--text-primary); outline:none; min-height:36px;" />
             <button type="button" id="map-csv-clear-btn" onclick="clearMapCsvSearch()" aria-label="검색어 초기화"
@@ -2583,6 +2549,33 @@
             </button>
             <span id="map-csv-count" style="font-size:11px; color:var(--text-muted); white-space:nowrap;">DB 로딩 중...</span>
           </div>
+
+          <div id="map-filter-panel" class="explore-filter-drawer" style="display:none; margin-top:8px; padding:14px 16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">장소 유형</div>
+            <div class="explore-filter-chips" style="margin-bottom:12px;">
+              <span class="chip explore-opt-chip active map-cat-chip" onclick="filterMapCategory('all', this)">
+                <i class="fa-solid fa-layer-group"></i> 전체 장소 (<span id="map-total-count">8</span>)
+              </span>
+              <span class="chip explore-opt-chip map-cat-chip" onclick="filterMapCategory('spot', this)">
+                <i class="fa-solid fa-clapperboard" style="color:var(--accent);"></i> 공식 촬영지
+              </span>
+              <span class="chip explore-opt-chip map-cat-chip" onclick="filterMapCategory('popup', this)">
+                <i class="fa-solid fa-store" style="color:#E11D48;"></i> 작품 팝업스토어
+              </span>
+              <span class="chip explore-opt-chip map-cat-chip" onclick="filterMapCategory('premiere', this)">
+                <i class="fa-solid fa-ticket" style="color:#7C3AED;"></i> 시사회·무대인사관
+              </span>
+            </div>
+            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">추천 작품</div>
+            <div class="explore-filter-chips">
+              <span class="chip explore-opt-chip map-work-chip active" onclick="filterMapByWork('all', this)">전체 작품</span>
+              <span class="chip explore-opt-chip map-work-chip" onclick="filterMapByWork('달빛이 머무는 밤', this)">달빛이 머무는 밤</span>
+              <span class="chip explore-opt-chip map-work-chip" onclick="filterMapByWork('너와 나의 시그널', this)">너와 나의 시그널</span>
+              <span class="chip explore-opt-chip map-work-chip" onclick="filterMapByWork('청춘의 파도', this)">청춘의 파도</span>
+              <span class="chip explore-opt-chip map-work-chip" onclick="filterMapByWork('네온 사일런스', this)">네온 사일런스</span>
+            </div>
+          </div>
+
           <div id="map-csv-quick-list" style="display:none; margin-top:8px; max-height:170px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px;"></div>
         </div>
 
@@ -2795,11 +2788,11 @@
           </button>
         </header>
 
-        <!-- 캘린더 통합 검색창 -->
-        <div style="padding: 12px 20px 6px 20px;">
+        <!-- 캘린더 통합 검색창 + 포커스 시 노출되는 필터 -->
+        <div id="cal-search-wrap" style="padding: 12px 20px 8px 20px;">
           <div style="display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px 12px;">
             <i class="fa-solid fa-magnifying-glass" style="color:var(--accent); font-size:14px;"></i>
-            <input type="text" id="cal-search-input" oninput="onCalSearchInput(this.value)"
+            <input type="text" id="cal-search-input" onfocus="openCalFilterPanel()" onclick="openCalFilterPanel()" oninput="onCalSearchInput(this.value)"
               placeholder="작품명, 배우, 감독, 행사명, 장소 키워드를 검색해보세요."
               style="flex:1; border:none; background:transparent; font-size:13px; color:var(--text-primary); outline:none; min-height:38px;" />
             <button type="button" id="cal-search-clear-btn" onclick="clearCalSearch()" aria-label="검색어 초기화"
@@ -2807,38 +2800,37 @@
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-        </div>
 
-        <!-- Role & Person Filter Section -->
-        <div class="chip-scroll">
-          <div class="chip active" onclick="setCalendarRoleFilter('all', this)">전체 스케줄</div>
-          <div class="chip" onclick="setCalendarRoleFilter('actor', this)"><i class="fa-solid fa-user"></i> 배우별 스케줄
-          </div>
-          <div class="chip" onclick="setCalendarRoleFilter('director', this)"><i class="fa-solid fa-video"></i> 감독별 스케줄
-          </div>
-        </div>
+          <div id="cal-filter-panel" class="explore-filter-drawer" style="display:none; margin-top:8px; padding:14px 16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">스케줄 구분</div>
+            <div class="explore-filter-chips" style="margin-bottom:12px;">
+              <span class="chip explore-opt-chip active" onclick="setCalendarRoleFilter('all', this)">전체 스케줄</span>
+              <span class="chip explore-opt-chip" onclick="setCalendarRoleFilter('actor', this)"><i class="fa-solid fa-user"></i> 배우별 스케줄</span>
+              <span class="chip explore-opt-chip" onclick="setCalendarRoleFilter('director', this)"><i class="fa-solid fa-video"></i> 감독별 스케줄</span>
+            </div>
 
-        <!-- Sub Person Quick Chips (배우/감독 선택에 따라 필터링 & 선택 시 컬러 변형) -->
-        <div id="calendar-person-chips-container"
-          style="padding: 8px 20px; background:var(--bg-subtle); border-bottom:1px solid var(--border); display:flex; gap:8px; overflow-x:auto; align-items:center;">
-          <span class="cal-person-chip active" data-role="all" onclick="filterCalendarByPerson('all', this)">
-            <i class="fa-solid fa-users"></i> 전체 인물
-          </span>
-          <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('차은호', this)">
-            <i class="fa-solid fa-user"></i> 배우 차은호
-          </span>
-          <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('윤서아', this)">
-            <i class="fa-solid fa-user"></i> 배우 윤서아
-          </span>
-          <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('한도경', this)">
-            <i class="fa-solid fa-user"></i> 배우 한도경
-          </span>
-          <span class="cal-person-chip" data-role="director" onclick="filterCalendarByPerson('김태원', this)">
-            <i class="fa-solid fa-clapperboard"></i> 김태원 감독
-          </span>
-          <span class="cal-person-chip" data-role="director" onclick="filterCalendarByPerson('이지은', this)">
-            <i class="fa-solid fa-clapperboard"></i> 이지은 감독
-          </span>
+            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">인물 빠른 필터</div>
+            <div id="calendar-person-chips-container" class="explore-filter-chips">
+              <span class="cal-person-chip active" data-role="all" onclick="filterCalendarByPerson('all', this)">
+                <i class="fa-solid fa-users"></i> 전체 인물
+              </span>
+              <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('차은호', this)">
+                <i class="fa-solid fa-user"></i> 배우 차은호
+              </span>
+              <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('윤서아', this)">
+                <i class="fa-solid fa-user"></i> 배우 윤서아
+              </span>
+              <span class="cal-person-chip" data-role="actor" onclick="filterCalendarByPerson('한도경', this)">
+                <i class="fa-solid fa-user"></i> 배우 한도경
+              </span>
+              <span class="cal-person-chip" data-role="director" onclick="filterCalendarByPerson('김태원', this)">
+                <i class="fa-solid fa-clapperboard"></i> 김태원 감독
+              </span>
+              <span class="cal-person-chip" data-role="director" onclick="filterCalendarByPerson('이지은', this)">
+                <i class="fa-solid fa-clapperboard"></i> 이지은 감독
+              </span>
+            </div>
+          </div>
         </div>
 
         <div class="responsive-split-view">
@@ -3694,10 +3686,11 @@
           <div
             style="padding: 6px 20px 4px; font-size:13px; font-weight:700; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
             <span><i class="fa-solid fa-folder" style="color:var(--accent);"></i> 나만의 컬렉션</span>
-            <span style="font-size:11px; color:var(--accent); cursor:pointer;">+ 새 컬렉션</span>
+            <button type="button" onclick="openCreateCollectionModal()"
+              style="background:transparent; border:none; padding:4px 8px; font-size:11px; font-weight:700; color:var(--accent); cursor:pointer;">+ 새 컬렉션</button>
           </div>
-          <div class="collections-strip" style="display:flex; gap:12px; overflow-x:auto; padding:10px 20px;">
-            <div class="col-thumb"
+          <div class="collections-strip" id="collections-strip" style="display:flex; gap:12px; overflow-x:auto; padding:10px 20px;">
+            <div class="col-thumb" onclick="openCollectionDetailModal('도깨비 · 영진해변', '도깨비', '공유 · 김고은')"
               style="width:148px; height:92px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
               <img src="assets/drama-stills/goblin-beach.png" style="width:100%; height:100%; object-fit:cover;" />
               <div
@@ -3706,7 +3699,7 @@
                 <div style="font-size:10px; color:#E3DDD4;">공유 · 김고은 · 4장면</div>
               </div>
             </div>
-            <div class="col-thumb"
+            <div class="col-thumb" onclick="openCollectionDetailModal('나의 해방일지 · 성환역', '나의 해방일지', '김지원 · 손석구')"
               style="width:148px; height:92px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
               <img src="assets/drama-stills/liberation-bridge.png" style="width:100%; height:100%; object-fit:cover;" />
               <div
@@ -3715,7 +3708,7 @@
                 <div style="font-size:10px; color:#E3DDD4;">김지원 · 손석구 · 4장면</div>
               </div>
             </div>
-            <div class="col-thumb"
+            <div class="col-thumb" onclick="openCollectionDetailModal('사랑의 불시착 · 설산', '사랑의 불시착', '현빈 · 손예진')"
               style="width:148px; height:92px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
               <img src="assets/drama-stills/cloy-alps.png" style="width:100%; height:100%; object-fit:cover;" />
               <div
@@ -4456,42 +4449,42 @@
           <div class="sr-step active" id="sr-step-1">
             <!-- OTT 연동하러 가기 Bar (TVING & Wavve 전용) -->
             <div
-              style="background:#151C33; border:1px solid #2A3558; border-radius:14px; padding:12px 14px; margin-bottom:20px;">
+              style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:20px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-size:13px; color:#A8B1CC; font-weight:500;">OTT 계정 연동</span>
+                <span style="font-size:13px; color:var(--text-secondary); font-weight:500;">OTT 계정 연동</span>
                 <div style="display:flex; gap:6px;">
                   <button type="button" onclick="setSrOttState('connected')" id="sr-state-btn-ok"
-                    style="font-size:10px; padding:2px 7px; border-radius:6px; border:1px solid #2A3558; background:#1D2644; color:#A8B1CC; cursor:pointer;">연동됨</button>
+                    style="font-size:10px; padding:2px 7px; border-radius:6px; border:1px solid var(--border); background:var(--surface-high); color:var(--text-secondary); cursor:pointer;">연동됨</button>
                   <button type="button" onclick="setSrOttState('disconnected')" id="sr-state-btn-off"
-                    style="font-size:10px; padding:2px 7px; border-radius:6px; border:1px solid #2A3558; background:transparent; color:#5D6785; cursor:pointer;">연동
+                    style="font-size:10px; padding:2px 7px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer;">연동
                     전</button>
                 </div>
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <a href="https://www.tving.com" target="_blank" rel="noopener noreferrer"
                   onclick="triggerToast('TVING 연동 페이지로 이동합니다.')"
-                  style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background:#1D2644; border:1px solid #2A3558; text-decoration:none; color:#FFFFFF;">
+                  style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background:var(--surface-high); border:1px solid var(--border); text-decoration:none; color:var(--text-primary);">
                   <span style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600;">
                     <span
                       style="width:7px; height:7px; border-radius:50%; background:#FF143C; display:inline-block;"></span>
                     TVING
                   </span>
-                  <span style="font-size:11px; color:#A8B1CC; display:inline-flex; align-items:center; gap:4px;">
+                  <span style="font-size:11px; color:var(--text-secondary); display:inline-flex; align-items:center; gap:4px;">
                     연동하러 가기 <i class="fa-solid fa-arrow-up-right-from-square"
-                      style="font-size:10px; color:#E98B26;"></i>
+                      style="font-size:10px; color:var(--accent);"></i>
                   </span>
                 </a>
                 <a href="https://www.wavve.com" target="_blank" rel="noopener noreferrer"
                   onclick="triggerToast('Wavve 연동 페이지로 이동합니다.')"
-                  style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background:#1D2644; border:1px solid #2A3558; text-decoration:none; color:#FFFFFF;">
+                  style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background:var(--surface-high); border:1px solid var(--border); text-decoration:none; color:var(--text-primary);">
                   <span style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600;">
                     <span
                       style="width:7px; height:7px; border-radius:50%; background:#0075FF; display:inline-block;"></span>
                     Wavve
                   </span>
-                  <span style="font-size:11px; color:#A8B1CC; display:inline-flex; align-items:center; gap:4px;">
+                  <span style="font-size:11px; color:var(--text-secondary); display:inline-flex; align-items:center; gap:4px;">
                     연동하러 가기 <i class="fa-solid fa-arrow-up-right-from-square"
-                      style="font-size:10px; color:#E98B26;"></i>
+                      style="font-size:10px; color:var(--accent);"></i>
                   </span>
                 </a>
               </div>
@@ -4505,9 +4498,9 @@
               <div style="position:relative; margin-bottom:10px;">
                 <input type="text" id="sr-work-search-input" oninput="renderSrSearchResults(this.value)"
                   placeholder="TVING · Wavve 작품명 검색"
-                  style="width:100%; background:#151C33; border:1px solid #2A3558; border-radius:12px; padding:12px 38px 12px 14px; color:#FFFFFF; font-size:14px; outline:none; box-sizing:border-box;" />
+                  style="width:100%; background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 38px 12px 14px; color:var(--text-primary); font-size:14px; outline:none; box-sizing:border-box;" />
                 <i class="fa-solid fa-magnifying-glass"
-                  style="position:absolute; right:14px; top:14px; color:#5D6785; font-size:13px;"></i>
+                  style="position:absolute; right:14px; top:14px; color:var(--text-muted); font-size:13px;"></i>
               </div>
               <div id="sr-search-results"></div>
             </div>
@@ -4529,8 +4522,8 @@
               <img id="sr-preview-img" src="assets/drama-stills/goblin-night.png" alt="OTT 캡처 장면" />
               <div id="sr-capture-loading"
                 style="display:none; position:absolute; inset:0; background:rgba(12,18,36,0.82); align-items:center; justify-content:center; flex-direction:column; gap:8px; z-index:4;">
-                <i class="fa-solid fa-circle-notch fa-spin" style="color:#E98B26; font-size:22px;"></i>
-                <span style="font-size:12px; color:#A8B1CC;">OTT 재생 시점의 프레임을 가져오는 중...</span>
+                <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--accent); font-size:22px;"></i>
+                <span style="font-size:12px; color:var(--text-secondary);">OTT 재생 시점의 프레임을 가져오는 중...</span>
               </div>
               <div class="sr-preview-hint" id="sr-preview-hint">OTT에서 불러온 시점이에요</div>
               <div class="sr-preview-timestamp">
@@ -4542,12 +4535,12 @@
             <!-- Direct OTT Sync Action Row -->
             <div style="display:flex; gap:8px; margin-bottom:16px;">
               <button type="button" onclick="syncStillFromOtt()"
-                style="flex:1; min-height:44px; background:#151C33; border:1px solid #E98B26; border-radius:12px; color:#FFFFFF; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;">
-                <i class="fa-solid fa-tower-broadcast" style="color:#E98B26;"></i>
+                style="flex:1; min-height:44px; background:var(--bg-subtle); border:1px solid var(--accent); border-radius:12px; color:var(--text-primary); font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;">
+                <i class="fa-solid fa-tower-broadcast" style="color:var(--accent);"></i>
                 <span id="sr-sync-ott-btn-text">TVING 현재 시점 장면 가져오기</span>
               </button>
               <label for="sr-file-upload"
-                style="min-height:44px; padding:0 14px; background:#151C33; border:1px solid #2A3558; border-radius:12px; color:#A8B1CC; font-size:12px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
+                style="min-height:44px; padding:0 14px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; color:var(--text-secondary); font-size:12px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;">
                 <i class="fa-solid fa-image"></i> 직접 추가
               </label>
               <input type="file" id="sr-file-upload" accept="image/*" style="display:none;"
@@ -4569,8 +4562,8 @@
             <!-- Captured Frame Interval Strip (±10초 OTT 연동 구간) -->
             <div style="margin-top:18px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-size:13px; color:#A8B1CC;">현재 시점 앞뒤 OTT 프레임</span>
-                <span style="font-size:11px; color:#5D6785;">탭하여 정확한 컷 선택</span>
+                <span style="font-size:13px; color:var(--text-secondary);">현재 시점 앞뒤 OTT 프레임</span>
+                <span style="font-size:11px; color:var(--text-muted);">탭하여 정확한 컷 선택</span>
               </div>
               <div class="sr-still-strip" id="sr-still-strip"></div>
             </div>
@@ -4588,11 +4581,11 @@
               </div>
               <div style="flex:1; min-width:0;">
                 <div
-                  style="font-size:13px; font-weight:600; color:#FFFFFF; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+                  style="font-size:13px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
                   id="sr-step3-work">쓸쓸하고 찬란하神 – 도깨비</div>
                 <div class="sr-stilltop-hint">탭하여 OTT 장면 시점 다시 선택</div>
               </div>
-              <i class="fa-solid fa-chevron-right" style="color:#5D6785; font-size:12px;"></i>
+              <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
             </div>
 
             <!-- 1. 태그 (직접 입력 우선 + 하단 작은 기존 옵션) -->
@@ -4601,15 +4594,15 @@
               <div style="display:flex; gap:8px;">
                 <input type="text" id="sr-custom-tag-input" placeholder="태그를 직접 입력하고 Enter (예: 첫사랑, 영진해변)"
                   onkeydown="if(event.key==='Enter'){event.preventDefault(); addSrCustomTag();}"
-                  style="flex:1; min-height:44px; background:#151C33; border:1px solid #2A3558; border-radius:12px; padding:0 14px; color:#FFFFFF; font-size:14px; outline:none;" />
+                  style="flex:1; min-height:44px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:0 14px; color:var(--text-primary); font-size:14px; outline:none;" />
                 <button type="button" onclick="addSrCustomTag()"
-                  style="min-height:44px; padding:0 16px; background:#1D2644; border:1px solid #2A3558; border-radius:12px; color:#FFFFFF; font-size:13px; font-weight:600; cursor:pointer;">추가</button>
+                  style="min-height:44px; padding:0 16px; background:var(--surface-high); border:1px solid var(--border); border-radius:12px; color:var(--text-primary); font-size:13px; font-weight:600; cursor:pointer;">추가</button>
               </div>
               <!-- Added Custom & Selected Tags Display -->
               <div id="sr-selected-tags-row" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"></div>
               <!-- Smaller Existing Preset Options Underneath -->
               <div style="margin-top:10px;">
-                <div style="font-size:11px; color:#5D6785; margin-bottom:6px;">추천 감정 태그 (최대 3개 선택)</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">추천 감정 태그 (최대 3개 선택)</div>
                 <div class="sr-emo-chips" id="sr-emo-chips" style="gap:6px;">
                   <button type="button" class="sr-emo-chip" style="height:28px; padding:0 11px; font-size:11px;"
                     onclick="toggleSrEmotion('설레는', this)">설레는</button>
@@ -4635,7 +4628,7 @@
               <textarea id="sr-quote-input" class="sr-textarea" rows="3" maxlength="120" oninput="onSrQuoteInput()"
                 placeholder="기억에 남은 대사를 남기거나 아래 자막 추천을 눌러 채워보세요"></textarea>
               <div class="sr-char-count"><span id="sr-quote-count">0</span> / 120</div>
-              <div style="font-size:11px; color:#5D6785; margin-top:8px; margin-bottom:4px;">이 장면의 대사 추천</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:8px; margin-bottom:4px;">이 장면의 대사 추천</div>
               <div class="sr-suggestion-chips" id="sr-subtitle-chips"></div>
             </div>
 
@@ -4645,7 +4638,7 @@
               <div class="sr-char-chips" id="sr-cast-chips"></div>
               <div id="sr-custom-char-wrap" style="display:none; margin-top:10px;">
                 <input type="text" id="sr-custom-char-input" placeholder="인물 또는 배우 이름 입력"
-                  style="width:100%; min-height:44px; background:#151C33; border:1px solid #2A3558; border-radius:12px; padding:0 14px; color:#FFFFFF; font-size:14px; outline:none; box-sizing:border-box;" />
+                  style="width:100%; min-height:44px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:0 14px; color:var(--text-primary); font-size:14px; outline:none; box-sizing:border-box;" />
               </div>
             </div>
 
@@ -4665,7 +4658,7 @@
             <div class="sr-privacy-row">
               <div>
                 <div class="sr-privacy-label">씬 렌즈에 공개</div>
-                <div style="font-size:11px; color:#5D6785; margin-top:3px;">익명으로 공유되며 프로필은 노출되지 않아요</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:3px;">익명으로 공유되며 프로필은 노출되지 않아요</div>
               </div>
               <div class="switch-toggle" id="sr-public-switch" onclick="toggleSrPublic()" role="switch"
                 aria-checked="false">
@@ -4993,6 +4986,50 @@
           <div style="display:flex; gap:8px; margin-top:14px;">
             <button class="sl-btn-detail" style="flex:1; justify-content:center; padding:10px 16px;" onclick="closeModal('scene-detail-modal')">닫기</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. 나만의 컬렉션 상세 모달 -->
+    <div class="modal-backdrop" id="collection-detail-modal" onclick="if(event.target===this) closeModal('collection-detail-modal')">
+      <div class="modal-dialog" style="max-width:580px; max-height:86vh; overflow-y:auto;">
+        <div class="modal-head">
+          <div class="title" id="cdm-title"><i class="fa-solid fa-folder-open" style="color:var(--accent);"></i> 컬렉션</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('collection-detail-modal')"></i>
+        </div>
+        <div id="cdm-subtitle" style="font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;"></div>
+        <div id="cdm-scenes-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>
+    </div>
+
+    <!-- 10. + 새 컬렉션 생성 모달 -->
+    <div class="modal-backdrop" id="create-collection-modal" onclick="if(event.target===this) closeModal('create-collection-modal')">
+      <div class="modal-dialog" style="max-width:480px; max-height:86vh; overflow-y:auto;">
+        <div class="modal-head">
+          <div class="title"><i class="fa-solid fa-folder-plus" style="color:var(--accent);"></i> 새 컬렉션 만들기</div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('create-collection-modal')"></i>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">컬렉션 이름 *</label>
+          <input type="text" id="new-col-title" placeholder="예: 겨울 밤 인생 드라마 명장면"
+            style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">설명 (선택)</label>
+          <input type="text" id="new-col-desc" placeholder="예: 눈 내리는 밤에 꺼내 보는 장면 모음"
+            style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">담을 장면 선택</label>
+          <div id="new-col-scenes-checklist" style="max-height:170px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); border-radius:10px; padding:8px; background:var(--bg-subtle);"></div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal('create-collection-modal')">취소</button>
+          <button type="button" class="btn btn-primary" style="flex:2;" onclick="submitNewCollection()">컬렉션 생성하기</button>
         </div>
       </div>
     </div>
@@ -5679,11 +5716,34 @@
       listEl.innerHTML = matches.map(m => renderCalEventCard(m.dateKey, m.ev)).join('');
     }
 
+    function openCalFilterPanel() {
+      const panel = document.getElementById('cal-filter-panel');
+      if (panel) panel.style.display = 'block';
+    }
+
+    function openMapFilterPanel() {
+      const panel = document.getElementById('map-filter-panel');
+      if (panel) panel.style.display = 'block';
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#map-search-wrap')) {
+        const mp = document.getElementById('map-filter-panel');
+        if (mp) mp.style.display = 'none';
+      }
+      if (!e.target.closest('#cal-search-wrap')) {
+        const cp = document.getElementById('cal-filter-panel');
+        if (cp) cp.style.display = 'none';
+      }
+    });
+
     function clearCalSearch() {
       const inputEl = document.getElementById('cal-search-input');
       const clearBtn = document.getElementById('cal-search-clear-btn');
+      const panel = document.getElementById('cal-filter-panel');
       if (inputEl) inputEl.value = '';
       if (clearBtn) clearBtn.style.display = 'none';
+      if (panel) panel.style.display = 'none';
       selectCalDay(calState.selectedDay);
     }
 
@@ -6814,8 +6874,10 @@
       const inputEl = document.getElementById('map-csv-search-input');
       const clearBtn = document.getElementById('map-csv-clear-btn');
       const listEl = document.getElementById('map-csv-quick-list');
+      const panel = document.getElementById('map-filter-panel');
       if (inputEl) inputEl.value = '';
       if (clearBtn) clearBtn.style.display = 'none';
+      if (panel) panel.style.display = 'none';
       if (listEl) {
         listEl.style.display = 'none';
         listEl.innerHTML = '';
@@ -6884,10 +6946,14 @@
       triggerToast(`📍 [${item.placeName || item.title}] 위치로 이동했습니다.`);
     }
 
-    // OTT 바로 보러가기 핸들러 (티빙 & 웨이브)
+    // OTT 바로 보러가기 핸들러 (티빙 & 웨이브 공식 사이트 새 창 연결)
     function openOttPlayback(ott, work, time) {
-      const ottColor = (ott === 'TVING') ? '#FF143C' : '#0075FF';
-      triggerToast(`🎬 ${ott} 앱으로 연결: [${work} ${time}] 장면으로 바로 이동합니다.`);
+      const normalized = String(ott || '').toUpperCase();
+      const targetUrl = normalized.includes('WAVVE')
+        ? 'https://www.wavve.com'
+        : 'https://www.tving.com';
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      triggerToast(`🎬 ${ott || 'OTT'} 공식 페이지로 이동합니다. (${work || ''})`);
     }
 
     // 레거시 호환
@@ -8069,10 +8135,147 @@
     }
 
     // 페이지 로드 시 카카오맵 초기화 및 나이트모드 복원
+    const COLLECTIONS_STORAGE_KEY = 'scenein_custom_collections';
+    let customCollectionsStore = [];
+
+    function loadCustomCollections() {
+      try {
+        const raw = localStorage.getItem(COLLECTIONS_STORAGE_KEY);
+        customCollectionsStore = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(customCollectionsStore)) customCollectionsStore = [];
+      } catch (_) {
+        customCollectionsStore = [];
+      }
+      renderCustomCollections();
+    }
+
+    function renderCustomCollections() {
+      const strip = document.getElementById('collections-strip');
+      if (!strip) return;
+      strip.querySelectorAll('[data-custom-col="true"]').forEach(el => el.remove());
+
+      const html = customCollectionsStore.map((col, idx) => `
+        <div class="col-thumb" data-custom-col="true" onclick="openCustomCollectionDetail(${idx})"
+          style="width:148px; height:92px; border-radius:14px; position:relative; overflow:hidden; border:1.5px solid var(--border); cursor:pointer; flex-shrink:0;">
+          <img src="${escapeHtml(col.cover || 'assets/drama-stills/goblin-night.png')}" style="width:100%; height:100%; object-fit:cover;" />
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(12,18,36,0.82), rgba(12,18,36,0.18)); display:flex; flex-direction:column; justify-content:flex-end; padding:10px;">
+            <div style="font-size:11px; font-weight:700; color:#FFF; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(col.title)}</div>
+            <div style="font-size:10px; color:#E3DDD4;">${escapeHtml(col.desc || '나만의 컬렉션')} · ${col.items.length}장면</div>
+          </div>
+        </div>
+      `).join('');
+      if (html) strip.insertAdjacentHTML('beforeend', html);
+    }
+
+    function openCollectionDetailModal(colTitle, workKeyword, subtitle) {
+      const cards = Array.from(document.querySelectorAll('#archive-cards-list .archive-item'));
+      const matched = cards.filter(c => (c.dataset.work || '').includes(workKeyword));
+      renderCollectionDetailItems(colTitle, subtitle || `${workKeyword} 관련 장면 ${matched.length}개`, matched.map(c => ({
+        work: c.dataset.work || '',
+        quote: c.dataset.quote || '',
+        still: c.dataset.still || '',
+        ott: c.dataset.ott || 'TVING',
+        ep: c.dataset.ep || '',
+        person: c.dataset.person || '',
+        desc: c.dataset.desc || '',
+        place: c.dataset.place || ''
+      })));
+    }
+
+    function openCustomCollectionDetail(idx) {
+      const col = customCollectionsStore[idx];
+      if (!col) return;
+      renderCollectionDetailItems(col.title, col.desc || `${col.items.length}개의 장면`, col.items);
+    }
+
+    function renderCollectionDetailItems(title, subtitle, items) {
+      const titleEl = document.getElementById('cdm-title');
+      const subEl = document.getElementById('cdm-subtitle');
+      const listEl = document.getElementById('cdm-scenes-list');
+      if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-folder-open" style="color:var(--accent);"></i> ${escapeHtml(title)}`;
+      if (subEl) subEl.innerText = subtitle;
+
+      if (!listEl) return;
+      if (!items || items.length === 0) {
+        listEl.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-muted); font-size:13px;">이 컬렉션에 담긴 장면이 없습니다.</div>';
+      } else {
+        listEl.innerHTML = items.map((item, i) => `
+          <div style="display:flex; gap:12px; align-items:center; padding:10px; border:1px solid var(--border); border-radius:14px; background:var(--bg-subtle);">
+            <img src="${escapeHtml(item.still || 'assets/drama-stills/goblin-night.png')}" style="width:76px; height:58px; border-radius:8px; object-fit:cover; flex-shrink:0;" />
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:13px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">${escapeHtml(item.work)}</div>
+              <div style="font-size:12px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">"${escapeHtml(item.quote)}"</div>
+            </div>
+            <button type="button" class="sl-btn-ott" style="padding:6px 10px; font-size:11px; flex-shrink:0;"
+              onclick="openOttPlayback('${escapeHtml(item.ott || 'TVING')}', '${escapeHtml(item.work).replace(/'/g, "\\'")}', '${escapeHtml(item.ep || '')}')">
+              <i class="fa-solid fa-play"></i> 보기
+            </button>
+          </div>
+        `).join('');
+      }
+      openModal('collection-detail-modal');
+    }
+
+    function openCreateCollectionModal() {
+      const listEl = document.getElementById('new-col-scenes-checklist');
+      const cards = Array.from(document.querySelectorAll('#archive-cards-list .archive-item'));
+      if (listEl) {
+        listEl.innerHTML = cards.map((c, idx) => `
+          <label style="display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:var(--surface); border:1px solid var(--border-light); cursor:pointer; font-size:12px; color:var(--text-primary);">
+            <input type="checkbox" class="new-col-scene-cb" value="${idx}" style="accent-color:var(--accent);" />
+            <span style="font-weight:700;">${escapeHtml(c.dataset.work || '')}</span>
+            <span style="color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(c.dataset.quote || '')}</span>
+          </label>
+        `).join('');
+      }
+      document.getElementById('new-col-title').value = '';
+      document.getElementById('new-col-desc').value = '';
+      openModal('create-collection-modal');
+    }
+
+    function submitNewCollection() {
+      const title = (document.getElementById('new-col-title').value || '').trim();
+      const desc = (document.getElementById('new-col-desc').value || '').trim();
+      if (!title) {
+        triggerToast('컬렉션 이름을 입력해주세요!');
+        document.getElementById('new-col-title').focus();
+        return;
+      }
+      const cards = Array.from(document.querySelectorAll('#archive-cards-list .archive-item'));
+      const selected = [];
+      document.querySelectorAll('.new-col-scene-cb:checked').forEach(cb => {
+        const c = cards[Number(cb.value)];
+        if (c) {
+          selected.push({
+            work: c.dataset.work || '',
+            quote: c.dataset.quote || '',
+            still: c.dataset.still || '',
+            ott: c.dataset.ott || 'TVING',
+            ep: c.dataset.ep || ''
+          });
+        }
+      });
+
+      customCollectionsStore.push({
+        title,
+        desc,
+        cover: selected[0]?.still || 'assets/drama-stills/goblin-night.png',
+        items: selected
+      });
+      try {
+        localStorage.setItem(COLLECTIONS_STORAGE_KEY, JSON.stringify(customCollectionsStore));
+      } catch (_) {}
+
+      renderCustomCollections();
+      closeModal('create-collection-modal');
+      triggerToast(`📁 [${title}] 컬렉션이 생성되었습니다!`);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       initKakaoMap();
       initExploreCardDetails();
       initArchiveCards();
+      loadCustomCollections();
       loadCalNotifsFromStorage();
       loadKoccaLocations();
       if (localStorage.getItem('scenein_night_mode') === 'true') {
