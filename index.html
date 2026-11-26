@@ -5011,6 +5011,26 @@
 
       // [안전장치]: 환경변수가 비어있거나 플레이스홀더일 때 앱 중단 없이 콘솔 경고 및 안내
       if (!isConfigured) {
+        // Expose a retry function so that if the key becomes available later (e.g., injected by index.ts), we can attempt init again.
+        // Assign the init function to a global variable for later invocation.
+        (window as any).__retryInitKakaoMap = initKakaoMap;
+        // Log the warning but do not block future retries.
+        console.warn(
+          '%c[SceneIn - Kakao Maps 보안 연동 안내]%c\\n' +
+          '카카오맵 JavaScript API 키가 설정되지 않았습니다.\\n' +
+          '보안을 위해 API 키는 소스코드에 하드코딩되지 않으며, 프로젝트 루트의 .env 파일에서 관리됩니다.\\n\\n' +
+          '▶ 설정 방법:\\n' +
+          '  1. 루트 .env 파일 열기\\n' +
+          '  2. EXPO_PUBLIC_KAKAO_MAP_KEY=\"발급받은_키\" 입력\\n' +
+          '  3. 카카오디벨로퍼스(https://developers.kakao.com) 웹 플랫폼 등록 주소:\\n' +
+          '     - http://localhost:8081\\n' +
+          '     - http://localhost:3000',
+          'color:#E98B26; font-weight:bold; font-size:12px;',
+          'color:inherit;'
+        );
+        // Do not return; allow future retry when key appears.
+        return;
+      }
         console.warn(
           '%c[SceneIn - Kakao Maps 보안 연동 안내]%c\n' +
           '카카오맵 JavaScript API 키가 설정되지 않았습니다.\n' +
@@ -5091,6 +5111,26 @@
     function toggleKakaoMapInfo() {
       const { isConfigured } = checkKakaoApiKey();
       if (!isConfigured) {
+        // Expose a retry function so that if the key becomes available later (e.g., injected by index.ts), we can attempt init again.
+        // Assign the init function to a global variable for later invocation.
+        (window as any).__retryInitKakaoMap = initKakaoMap;
+        // Log the warning but do not block future retries.
+        console.warn(
+          '%c[SceneIn - Kakao Maps 보안 연동 안내]%c\\n' +
+          '카카오맵 JavaScript API 키가 설정되지 않았습니다.\\n' +
+          '보안을 위해 API 키는 소스코드에 하드코딩되지 않으며, 프로젝트 루트의 .env 파일에서 관리됩니다.\\n\\n' +
+          '▶ 설정 방법:\\n' +
+          '  1. 루트 .env 파일 열기\\n' +
+          '  2. EXPO_PUBLIC_KAKAO_MAP_KEY=\"발급받은_키\" 입력\\n' +
+          '  3. 카카오디벨로퍼스(https://developers.kakao.com) 웹 플랫폼 등록 주소:\\n' +
+          '     - http://localhost:8081\\n' +
+          '     - http://localhost:3000',
+          'color:#E98B26; font-weight:bold; font-size:12px;',
+          'color:inherit;'
+        );
+        // Do not return; allow future retry when key appears.
+        return;
+      }
         triggerToast('🔑 .env 파일에 EXPO_PUBLIC_KAKAO_MAP_KEY를 입력하면 카카오맵이 활성화됩니다!');
       } else {
         triggerToast('🗺️ 카카오맵 실시간 연동이 정상 작동 중입니다.');
