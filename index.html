@@ -5904,7 +5904,7 @@
           </div>
         `;
 
-        card.onclick = (e) => {
+            card.onclick = (e) => {
           const btn = e.target.closest('button');
           if (!btn) {
             openExploreCardDetail(card);
@@ -5916,6 +5916,7 @@
           } else if (action === 'ott') {
             openOttPlayback(ott, work, ep);
           } else if (action === 'bookmark') {
+            const coordEntry = Object.entries(CURATED_PLACE_COORDS).find(([k]) => (placePart || '').includes(k))?.[1] || {};
             toggleSceneBookmark({
               key: sceneKey,
               work,
@@ -5925,11 +5926,173 @@
               tm,
               emotion,
               character: person,
+              placeName: placePart || `${work} 주요 촬영지`,
+              address: coordEntry.address || (placePart ? `${placePart} 일대` : ''),
+              lat: coordEntry.lat || 37.5539,
+              lng: coordEntry.lng || 126.9798,
+              desc,
               ott
             }, btn);
           }
         };
       });
+    }
+
+    function openArchiveCardDetail(card) {
+      if (!card) return;
+      const work = card.dataset.work || '';
+      const quote = card.dataset.quote || '';
+      const ott = card.dataset.ott || 'TVING';
+      const person = card.dataset.person || '';
+      const img = card.dataset.still || '';
+      const ep = card.dataset.ep || '';
+      const desc = card.dataset.desc || '';
+      const placePart = card.dataset.place || '';
+      const coordEntry = Object.entries(CURATED_PLACE_COORDS).find(([k]) => (placePart || '').includes(k))?.[1]
+        || { lat: 37.5539, lng: 126.9798, address: placePart ? `${placePart} 일대` : '작품 공식 촬영지 정보' };
+
+      openSceneDetailModal({
+        title: work,
+        mediaBadge: ott,
+        epBadge: ep,
+        stillUrl: img,
+        quote: quote,
+        desc: desc,
+        cast: person,
+        placeName: placePart || `${work} 주요 촬영지`,
+        address: coordEntry.address,
+        lat: coordEntry.lat,
+        lng: coordEntry.lng,
+        wardrobe: CURATED_WARDROBE_MAP[work] || '주연 배우 시그니처 시즌 아우터 및 데일리 캐주얼 스타일'
+      });
+    }
+
+    function openScrapedSceneDetail(key) {
+      const s = scrapedScenesStore.find(x => x.key === key);
+      if (!s) return;
+      openSceneDetailModal({
+        title: s.work,
+        mediaBadge: s.ott || '드라마',
+        epBadge: [s.ep, s.tm].filter(Boolean).join(' '),
+        stillUrl: s.stillUrl || '',
+        quote: s.quote || '',
+        desc: s.desc || '씬 렌즈에서 스크랩하여 보관한 명장면입니다.',
+        cast: s.character || '',
+        placeName: s.placeName || `${s.work} 촬영지`,
+        address: s.address || '촬영지 상세 정보',
+        lat: s.lat,
+        lng: s.lng,
+        wardrobe: CURATED_WARDROBE_MAP[s.work] || ''
+      });
+    }
+
+    function initArchiveCards() {
+      const transformStaticArchiveCard = (card, isScraped) => {
+        if (card.dataset.slTransformed === 'true') return;
+        card.dataset.slTransformed = 'true';
+        const img = card.querySelector('img')?.getAttribute('src') || '';
+        const spans = Array.from(card.querySelectorAll('span'));
+        const epText = spans[0]?.innerText?.replace(/\s+/g, ' ').trim() || '';
+        const emotion = card.dataset.emotion || '여운 깊은';
+
+        const directDivs = Array.from(card.children).filter(el => el.tagName === 'DIV');
+        const headerLine = directDivs[1]?.innerText?.replace(/\s+/g, ' ').trim() || '';
+        const quoteRaw = directDivs[2]?.innerText?.trim() || '';
+        const quote = quoteRaw.replace(/^"|"$/g, '');
+        const desc = directDivs[3]?.innerText?.replace(/\s+/g, ' ').trim() || '';
+
+        const headerParts = headerLine.split('·').map(p => p.trim());
+        const work = headerParts[0] || headerLine;
+        const person = headerParts.slice(1).join(' · ') || '';
+        const ottBtnText = card.querySelector('button')?.innerText || '';
+        const ott = ottBtnText.includes('Wavve') ? 'Wavve' : 'TVING';
+
+        let placePart = '';
+        if (desc.includes('촬영지:')) {
+          placePart = desc.split('촬영지:')[1].split('·')[0].trim();
+        }
+
+        card.dataset.work = work;
+        card.dataset.person = person;
+        card.dataset.quote = quote;
+        card.dataset.still = img;
+        card.dataset.ep = epText;
+        card.dataset.desc = desc;
+        card.dataset.ott = ott;
+        card.dataset.place = placePart;
+
+        const tags = [
+          `#${work.replace(/\s+/g, '')}`,
+          `#${emotion.replace(/\s+/g, '')}`,
+          placePart ? `#${placePart.split(',')[0].trim().replace(/\s+/g, '')}` : ''
+        ].filter(Boolean).slice(0, 4);
+
+        const rightActionsHtml = isScraped
+          ? `<div style="display:flex; align-items:center; gap:10px;">
+               <button type="button" class="sl-bookmark-btn is-saved" data-action="unscrap" title="스크랩 해제" aria-label="스크랩 해제">
+                 <i class="fa-solid fa-bookmark"></i>
+               </button>
+               <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--error);" data-action="delete" title="삭제" aria-label="삭제">
+                 <i class="fa-regular fa-trash-can"></i>
+               </button>
+             </div>`
+          : `<div style="display:flex; align-items:center; gap:10px;">
+               <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--accent);" data-action="share" title="공유" aria-label="공유">
+                 <i class="fa-solid fa-share-nodes"></i>
+               </button>
+               <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--error);" data-action="delete" title="삭제" aria-label="삭제">
+                 <i class="fa-regular fa-trash-can"></i>
+               </button>
+             </div>`;
+
+        card.className = `card ${isScraped ? 'scraped-item' : 'archive-item'} sl-card`;
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+          <div class="sl-card-media">
+            <img src="${escapeHtml(img)}" alt="${escapeHtml(work)}" />
+          </div>
+          <div class="sl-card-body">
+            <div class="sl-card-title">${escapeHtml(work)}</div>
+            <div class="sl-card-quote">"${escapeHtml(quote)}"</div>
+            <div class="sl-card-tags">
+              ${tags.map(t => `<span class="sl-tag-pill">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="sl-card-actions">
+              <div class="sl-card-btn-group">
+                <button type="button" class="sl-btn-detail" data-action="detail">
+                  <i class="fa-solid fa-circle-info"></i> 상세 정보
+                </button>
+                <button type="button" class="sl-btn-ott" data-action="ott">
+                  <i class="fa-solid fa-play"></i> ${escapeHtml(ott)} 바로보기
+                </button>
+              </div>
+              ${rightActionsHtml}
+            </div>
+          </div>
+        `;
+
+        card.onclick = (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) {
+            openArchiveCardDetail(card);
+            return;
+          }
+          const action = btn.dataset.action;
+          if (action === 'detail') {
+            openArchiveCardDetail(card);
+          } else if (action === 'ott') {
+            openOttPlayback(ott, work, epText);
+          } else if (action === 'share') {
+            openShareModal(work, quote);
+          } else if (action === 'delete' || action === 'unscrap') {
+            card.remove();
+            triggerToast(isScraped ? '스크랩이 삭제되었습니다.' : '장면이 씬 아카이브에서 삭제되었습니다.');
+          }
+        };
+      };
+
+      document.querySelectorAll('#archive-cards-list .archive-item').forEach(c => transformStaticArchiveCard(c, false));
+      document.querySelectorAll('#scraped-cards-list .scraped-item:not([data-dynamic-scrap="true"])').forEach(c => transformStaticArchiveCard(c, true));
     }
 
     function focusMapFromSceneDetail() {
@@ -6148,27 +6311,54 @@
       if (!scrapedList) return;
       scrapedList.querySelectorAll('[data-dynamic-scrap="true"]').forEach(el => el.remove());
 
-      const html = scrapedScenesStore.map(s => `
-        <div class="card scraped-item" data-dynamic-scrap="true" data-emotion="${escapeHtml(s.emotion || '')}" style="animation: slideUp 0.25s ease-out;">
+      const html = scrapedScenesStore.map(s => {
+        const tags = [
+          `#${(s.work || '').replace(/\s+/g, '')}`,
+          s.emotion ? `#${s.emotion.replace(/\s+/g, '')}` : '',
+          s.placeName ? `#${s.placeName.split('·')[0].trim().replace(/\s+/g, '')}` : ''
+        ].filter(Boolean).slice(0, 4);
+        const ottLabel = s.ott && s.ott !== '공공DB' ? `${s.ott} 바로보기` : 'OTT에서 보기';
+        return `
+        <div class="card scraped-item sl-card" data-dynamic-scrap="true" data-emotion="${escapeHtml(s.emotion || '')}" style="animation: slideUp 0.25s ease-out; cursor:pointer;"
+          onclick="if(!event.target.closest('button')) openScrapedSceneDetail('${escapeHtml(s.key)}')">
           ${s.stillUrl ? `
-          <div style="height:170px; border-radius:12px; overflow:hidden; margin-bottom:12px; background:var(--surface-high);">
-            <img src="${escapeHtml(s.stillUrl)}" style="width:100%; height:100%; object-fit:cover; display:block;" />
-          </div>` : ''}
-          <div style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">${escapeHtml(s.work)}</div>
-          <div style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">
-            "${escapeHtml(s.quote)}"
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
-            <button class="sl-btn-ott" style="padding:6px 12px; font-size:11px;" onclick="openOttPlayback('${escapeHtml(s.ott || 'TVING')}', '${escapeHtml(s.work).replace(/'/g, "\\'")}', '${escapeHtml((s.ep || '') + ' ' + (s.tm || ''))}')">
-              <i class="fa-solid fa-play"></i> OTT에서 보기
-            </button>
-            <div style="display:flex; gap:14px; align-items:center;">
-              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${escapeHtml(s.work).replace(/'/g, "\\'")}', '${escapeHtml(s.quote).replace(/'/g, "\\'")}')"></i>
-              <i class="fa-solid fa-bookmark" style="color:var(--accent); cursor:pointer; font-size:18px;" title="스크랩 해제" onclick="removeScrapedByKey('${escapeHtml(s.key)}')"></i>
+          <div class="sl-card-media">
+            <img src="${escapeHtml(s.stillUrl)}" alt="${escapeHtml(s.work)}" />
+          </div>` : `
+          <div class="sl-card-media" style="display:flex; align-items:center; justify-content:center;">
+            <div style="text-align:center; color:var(--text-muted); padding:16px;">
+              <i class="fa-solid fa-clapperboard" style="font-size:28px; color:var(--accent); margin-bottom:6px; display:block;"></i>
+              <span style="font-size:12px; font-weight:600;">${escapeHtml(s.placeName || '촬영지 정보')}</span>
+            </div>
+          </div>`}
+          <div class="sl-card-body">
+            <div class="sl-card-title">${escapeHtml(s.work)}</div>
+            <div class="sl-card-quote">"${escapeHtml(s.quote)}"</div>
+            <div class="sl-card-tags">
+              ${tags.map(t => `<span class="sl-tag-pill">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="sl-card-actions">
+              <div class="sl-card-btn-group">
+                <button type="button" class="sl-btn-detail" onclick="openScrapedSceneDetail('${escapeHtml(s.key)}')">
+                  <i class="fa-solid fa-circle-info"></i> 상세 정보
+                </button>
+                <button type="button" class="sl-btn-ott" onclick="openOttPlayback('${escapeHtml(s.ott || 'TVING')}', '${escapeHtml(s.work).replace(/'/g, "\\'")}', '${escapeHtml((s.ep || '') + ' ' + (s.tm || ''))}')">
+                  <i class="fa-solid fa-play"></i> ${escapeHtml(ottLabel)}
+                </button>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <button type="button" class="sl-bookmark-btn is-saved" title="스크랩 해제" aria-label="스크랩 해제" onclick="removeScrapedByKey('${escapeHtml(s.key)}')">
+                  <i class="fa-solid fa-bookmark"></i>
+                </button>
+                <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--error);" title="스크랩 삭제" aria-label="스크랩 삭제" onclick="removeScrapedByKey('${escapeHtml(s.key)}')">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       if (html) {
         scrapedList.insertAdjacentHTML('afterbegin', html);
@@ -6909,30 +7099,39 @@
       const ottColor = work.ottColor;
 
       const cardsContainer = document.getElementById('archive-cards-list');
+      const finalQuote = quote || work.subtitles[0];
+      const pillTags = allTags.length > 0 ? allTags.map(t => `<span class="sl-tag-pill">#${escapeHtml(t)}</span>`).join('') : `<span class="sl-tag-pill">#${escapeHtml(primaryEmotion)}</span>`;
       const cardHtml = `
-        <div class="card archive-item" data-emotion="${primaryEmotion}" style="animation: slideUp 0.2s ease-out; border-left: 3px solid var(--accent);">
-          <div style="height:168px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
-            <img src="${stillUrl}" style="width:100%; height:100%; object-fit:cover;" />
-            <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
-              <span style="background:rgba(12,18,36,0.78); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">${ep} ${tm}</span>
-              <span style="background:${isPub ? 'rgba(16,185,129,0.9)' : 'rgba(110,103,95,0.9)'}; font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">${isPub ? '공개' : '비공개'}</span>
-            </div>
-            <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#${primaryEmotion}</div>
+        <div class="card archive-item sl-card" data-sl-transformed="true" data-emotion="${escapeHtml(primaryEmotion)}"
+          data-work="${escapeHtml(work.title)}" data-person="${escapeHtml(character)}" data-quote="${escapeHtml(finalQuote)}"
+          data-still="${escapeHtml(stillUrl)}" data-ep="${escapeHtml(ep + ' ' + tm)}" data-desc="${escapeHtml(memo || work.location)}"
+          data-ott="${escapeHtml(ott)}" data-place="${escapeHtml(work.location || '')}"
+          style="animation: slideUp 0.2s ease-out; cursor:pointer;"
+          onclick="if(!event.target.closest('button')) openArchiveCardDetail(this)">
+          <div class="sl-card-media">
+            <img src="${escapeHtml(stillUrl)}" alt="${escapeHtml(work.title)}" />
           </div>
-          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${work.title} · ${character}</div>
-          <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px; line-height:20px;">
-            "${quote || work.subtitles[0]}"
-          </div>
-          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
-            ${memo || `${work.location} · ${tagLine}`}
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
-            <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="openOttPlayback('${ott}', '${work.title}', '${ep} ${tm}')">
-              <i class="fa-solid fa-play" style="color:${ottColor};"></i> ${ott}에서 보기
-            </button>
-            <div style="display:flex; gap:14px;">
-              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${work.title}', '${(quote || work.subtitles[0]).replace(/'/g, "\\'")}')"></i>
-              <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="this.closest('.card').remove(); triggerToast('장면이 씬 아카이브에서 삭제되었습니다.');"></i>
+          <div class="sl-card-body">
+            <div class="sl-card-title">${escapeHtml(work.title)}</div>
+            <div class="sl-card-quote">"${escapeHtml(finalQuote)}"</div>
+            <div class="sl-card-tags">${pillTags}</div>
+            <div class="sl-card-actions">
+              <div class="sl-card-btn-group">
+                <button type="button" class="sl-btn-detail" onclick="openArchiveCardDetail(this.closest('.card'))">
+                  <i class="fa-solid fa-circle-info"></i> 상세 정보
+                </button>
+                <button type="button" class="sl-btn-ott" onclick="openOttPlayback('${escapeHtml(ott)}', '${escapeHtml(work.title).replace(/'/g, "\\'")}', '${escapeHtml(ep + ' ' + tm)}')">
+                  <i class="fa-solid fa-play"></i> ${escapeHtml(ott)} 바로보기
+                </button>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--accent);" onclick="openShareModal('${escapeHtml(work.title).replace(/'/g, "\\'")}', '${escapeHtml(finalQuote).replace(/'/g, "\\'")}')">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
+                <button type="button" style="background:transparent; border:none; padding:4px; cursor:pointer; font-size:16px; color:var(--error);" onclick="this.closest('.card').remove(); triggerToast('장면이 씬 아카이브에서 삭제되었습니다.');">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -7210,6 +7409,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initKakaoMap();
       initExploreCardDetails();
+      initArchiveCards();
       loadKoccaLocations();
       if (localStorage.getItem('scenein_night_mode') === 'true') {
         document.body.classList.add('dark-mode');
