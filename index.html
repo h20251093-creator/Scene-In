@@ -4638,6 +4638,7 @@
 
   </div>
 
+  <script src="env.js"></script>
   <script>
     // Tab Switching
     function switchTab(tabId, element) {
@@ -4648,7 +4649,17 @@
       if (target) {
         target.classList.add('active');
       }
-      element.classList.add('active');
+      if (element) element.classList.add('active');
+      if (tabId === 'map') {
+        if (typeof kakaoMapInstance !== 'undefined' && kakaoMapInstance) {
+          setTimeout(() => {
+            kakaoMapInstance.relayout();
+            kakaoMapInstance.setCenter(new window.kakao.maps.LatLng(37.5539, 126.9798));
+          }, 50);
+        } else if (typeof initKakaoMap === 'function') {
+          initKakaoMap();
+        }
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
