@@ -2265,6 +2265,18 @@
             onclick="filterMapByWork('네온 사일런스', this)">네온 사일런스</span>
         </div>
 
+        <!-- 한국문화정보원 전국 촬영지 DB 검색 바 -->
+        <div style="padding: 10px 20px 4px 20px;">
+          <div style="display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px 12px;">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--accent); font-size:13px;"></i>
+            <input type="text" id="map-csv-search-input" oninput="onMapCsvSearch(this.value)"
+              placeholder="작품명, 촬영지명, 지역 주소로 15,034개 촬영지 검색..."
+              style="flex:1; border:none; background:transparent; font-size:12px; color:var(--text-primary); outline:none; min-height:36px;" />
+            <span id="map-csv-count" style="font-size:11px; color:var(--text-muted); white-space:nowrap;">DB 로딩 중...</span>
+          </div>
+          <div id="map-csv-quick-list" style="display:none; margin-top:8px; max-height:170px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px;"></div>
+        </div>
+
         <!-- Automatic Multi-Column Split on Laptop/Desktop -->
         <div class="map-flex-container">
           <!-- Left: Dark Radar Map Canvas & Kakao Map Container -->
@@ -2631,7 +2643,7 @@
           <div class="explore-hero-search" id="explore-hero-search-box">
             <i class="fa-solid fa-magnifying-glass" style="color:var(--accent); font-size:18px;"></i>
             <input type="text" id="explore-search-input" oninput="onExploreSearchInput(this.value)"
-              onfocus="openExploreFilterPanel()" placeholder="작품명, 명대사, 배우, 감정 키워드를 검색해보세요..."
+              onfocus="openExploreFilterPanel()" placeholder="작품명, 명대사, 배우, 감정 키워드를 검색해보세요."
               style="flex:1; border:none; background:transparent; font-size:14px; font-weight:600; color:var(--text-primary); outline:none; min-height:44px;" />
             <button class="btn btn-secondary" onclick="toggleExploreFilterPanel()"
               style="min-height:34px; padding:4px 12px; font-size:11px; border-radius:8px; display:flex; align-items:center; gap:5px;">
@@ -3289,6 +3301,23 @@
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- 한국문화정보원 미디어영상촬영지 DB 검색 결과 (성능 최적화 페이지네이션) -->
+        <div id="kocca-explore-results-wrap" style="display:none; padding: 18px 20px 0 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary);">
+              <i class="fa-solid fa-database" style="color:var(--accent);"></i>
+              전국 영상 촬영지 DB 검색 결과 (<span id="kocca-explore-count">0</span>건)
+            </div>
+            <span style="font-size:11px; color:var(--text-secondary);">출처: 한국문화정보원 미디어콘텐츠 영상 촬영지 데이터</span>
+          </div>
+          <div class="cards-responsive-grid" id="kocca-explore-grid" style="padding:0;"></div>
+          <div id="kocca-load-more-wrap" style="display:none; text-align:center; margin-top:16px;">
+            <button class="btn btn-secondary" id="kocca-load-more-btn" onclick="loadMoreKoccaExplore()" style="min-width:220px;">
+              더 보기
+            </button>
           </div>
         </div>
 
@@ -4535,6 +4564,72 @@
       </div>
     </div>
 
+    <!-- 8. 씬 렌즈 장면 상세 정보 모달 -->
+    <div class="modal-backdrop" id="scene-detail-modal" onclick="if(event.target===this) closeModal('scene-detail-modal')">
+      <div class="modal-dialog" style="max-width:600px; max-height:88vh; overflow-y:auto;">
+        <div class="modal-head">
+          <div class="title" id="sdm-header-title">
+            <i class="fa-solid fa-clapperboard" style="color:var(--accent);"></i> 장면 상세 정보
+          </div>
+          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('scene-detail-modal')"></i>
+        </div>
+
+        <!-- 스틸컷 또는 플레이스홀더 -->
+        <div id="sdm-still-wrap" style="height:190px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:14px; background:var(--surface-high); display:flex; align-items:center; justify-content:center;">
+          <img id="sdm-still-img" src="" alt="장면 스틸컷" style="width:100%; height:100%; object-fit:cover; display:none;" />
+          <div id="sdm-still-placeholder" style="text-align:center; color:var(--text-muted); padding:16px;">
+            <i class="fa-solid fa-film" style="font-size:28px; color:var(--accent); margin-bottom:6px; display:block;"></i>
+            <span style="font-size:12px; font-weight:600;">장면 스틸컷 준비 중</span>
+          </div>
+          <span id="sdm-media-badge" style="position:absolute; top:10px; left:10px; background:var(--accent); color:#FFF; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">드라마</span>
+          <span id="sdm-ep-badge" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.72); color:#FFF; font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px;"></span>
+        </div>
+
+        <!-- 1. 장면 및 작품 기본 정보 -->
+        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
+            <i class="fa-solid fa-tv"></i> 장면 및 작품 기본 정보
+          </div>
+          <div id="sdm-work-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-bottom:4px;"></div>
+          <div id="sdm-quote" style="font-size:13px; font-style:italic; font-weight:600; color:var(--text-primary); margin-bottom:6px; display:none;"></div>
+          <div id="sdm-scene-desc" style="font-size:12px; color:var(--text-secondary); line-height:18px;"></div>
+        </div>
+
+        <!-- 2. 출연 배우진 정보 -->
+        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
+            <i class="fa-solid fa-user-group"></i> 출연 배우진 정보
+          </div>
+          <div id="sdm-cast" style="font-size:12px; color:var(--text-primary); line-height:18px;"></div>
+        </div>
+
+        <!-- 3. 촬영지 상세 정보 -->
+        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
+            <i class="fa-solid fa-location-dot"></i> 촬영지 상세 정보
+          </div>
+          <div id="sdm-place-name" style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:2px;"></div>
+          <div id="sdm-place-addr" style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;"></div>
+          <div id="sdm-place-meta" style="font-size:11px; color:var(--text-muted); line-height:17px;"></div>
+        </div>
+
+        <!-- 4. 배우 착용 의상·소품 정보 -->
+        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:14px;">
+          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
+            <i class="fa-solid fa-shirt"></i> 배우 착용 의상·소품 정보
+          </div>
+          <div id="sdm-wardrobe" style="font-size:12px; color:var(--text-secondary); line-height:18px;"></div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" id="sdm-map-btn" style="flex:1; display:none;" onclick="focusMapFromSceneDetail()">
+            <i class="fa-solid fa-map-location-dot"></i> 지도에서 위치 보기
+          </button>
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('scene-detail-modal')">닫기</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast-box" id="toast-box">
       <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:16px;"></i>
@@ -5097,9 +5192,13 @@
       triggerToast('모든 탐색 필터가 초기화되었습니다.');
     }
 
+    let exploreSearchTimer = null;
     function onExploreSearchInput(val) {
       exploreState.query = (val || '').trim().toLowerCase();
-      applyExploreFilters();
+      clearTimeout(exploreSearchTimer);
+      exploreSearchTimer = setTimeout(() => {
+        applyExploreFilters();
+      }, 120);
     }
 
     function applyExploreFilters() {
@@ -5129,8 +5228,14 @@
         }
       });
 
+      const csvMatchesCount = updateKoccaExploreResults();
+
       const countBadge = document.getElementById('explore-cards-count');
-      if (countBadge) countBadge.innerText = visibleCount;
+      if (countBadge) {
+        countBadge.innerText = exploreState.query
+          ? `${visibleCount} (공공DB +${csvMatchesCount.toLocaleString()})`
+          : visibleCount;
+      }
 
       // 필터 뱃지 개수 계산 (active filters)
       let activeFilterCount = 0;
@@ -5148,6 +5253,345 @@
           filterBadge.style.display = 'none';
         }
       }
+    }
+
+    // ── 한국문화정보원 미디어영상촬영지 DB 연동 & 씬 렌즈 상세 모달 ──
+    let koccaLocations = [];
+    let koccaLoaded = false;
+    let koccaFilteredMatches = [];
+    let koccaRenderedCount = 0;
+    const KOCCA_PAGE_SIZE = 30;
+    let currentSceneDetailTarget = null;
+    let koccaMapSearchMarkers = [];
+
+    const CURATED_WARDROBE_MAP = {
+      '쓸쓸하고 찬란하神 – 도깨비': '김신: 롱 울 캐시미어 코트(오버핏) & 터틀넥 니트 / 지은탁: 버건디 울 머플러 & 더플 코트',
+      '나의 해방일지': '염미정: 미니멀 코튼 셔츠 & 베이지 트러커 재킷 / 구씨: 워싱 데님 셔츠 & 워크웨어 점퍼',
+      '사랑의 불시착': '윤세리: 테일러드 트위드 재킷 & 롱 부츠 / 리정혁: 블랙 롱 코트 & 머플러',
+      '이태원 클라쓰': '박새로이: 카멜 MA-1 항공 점퍼 & 블랙 후드 / 조이서: 레더 바이커 재킷 & 체인 백',
+      '더 글로리': '문동은: 모노톤 트렌치코트 & 스트럭처드 토트백 / 박연진: 파스텔 트위드 투피스',
+      '눈물의 여왕': '홍해인: 하이엔드 테일러드 수트 & 실크 블라우스 / 백현우: 네이비 싱글 브레스티드 수트'
+    };
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function mediaTypeLabel(mt) {
+      if (mt === 'drama') return '드라마';
+      if (mt === 'movie') return '영화';
+      if (mt === 'show') return '예능/방송';
+      if (mt === 'artist') return '아티스트/MV';
+      return mt || '콘텐츠';
+    }
+
+    async function loadKoccaLocations() {
+      if (koccaLoaded) return;
+      try {
+        const res = await fetch('assets/data/kocca_locations.json');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        koccaLocations = data.map(item => ({
+          ...item,
+          _search: `${item.title || ''} ${item.placeName || ''} ${item.address || ''} ${item.desc || ''} ${item.cast || ''}`.toLowerCase()
+        }));
+        koccaLoaded = true;
+        const mapCountEl = document.getElementById('map-csv-count');
+        if (mapCountEl) mapCountEl.innerText = `${koccaLocations.length.toLocaleString()}개 촬영지`;
+        if (exploreState.query) applyExploreFilters();
+      } catch (err) {
+        console.warn('[SceneIn] 공공 촬영지 JSON 로드 실패:', err);
+        const mapCountEl = document.getElementById('map-csv-count');
+        if (mapCountEl) mapCountEl.innerText = 'DB 로드 대기';
+      }
+    }
+
+    function updateKoccaExploreResults() {
+      const wrap = document.getElementById('kocca-explore-results-wrap');
+      const grid = document.getElementById('kocca-explore-grid');
+      const countEl = document.getElementById('kocca-explore-count');
+      const loadMoreWrap = document.getElementById('kocca-load-more-wrap');
+      if (!wrap || !grid) return 0;
+
+      const q = exploreState.query;
+      if (!q || !koccaLoaded) {
+        wrap.style.display = 'none';
+        grid.innerHTML = '';
+        if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+        return 0;
+      }
+
+      koccaFilteredMatches = koccaLocations.filter(item => {
+        if (exploreState.type !== 'all' && item.mediaType !== exploreState.type) return false;
+        return item._search.includes(q);
+      });
+
+      wrap.style.display = 'block';
+      if (countEl) countEl.innerText = koccaFilteredMatches.length.toLocaleString();
+      grid.innerHTML = '';
+      koccaRenderedCount = 0;
+
+      if (koccaFilteredMatches.length === 0) {
+        grid.innerHTML = '<div class="card" style="grid-column:1/-1; text-align:center; padding:24px; color:var(--text-secondary);">검색어와 일치하는 공공 촬영지 데이터가 없습니다.</div>';
+        if (loadMoreWrap) loadMoreWrap.style.display = 'none';
+        return 0;
+      }
+
+      loadMoreKoccaExplore();
+      return koccaFilteredMatches.length;
+    }
+
+    function loadMoreKoccaExplore() {
+      const grid = document.getElementById('kocca-explore-grid');
+      const loadMoreWrap = document.getElementById('kocca-load-more-wrap');
+      const loadMoreBtn = document.getElementById('kocca-load-more-btn');
+      if (!grid) return;
+
+      const nextBatch = koccaFilteredMatches.slice(koccaRenderedCount, koccaRenderedCount + KOCCA_PAGE_SIZE);
+      const frag = document.createDocumentFragment();
+
+      nextBatch.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.onclick = (e) => {
+          if (e.target.closest('button')) return;
+          openCsvSceneDetail(item.id);
+        };
+        const shortDesc = item.desc ? (item.desc.length > 90 ? item.desc.slice(0, 90) + '...' : item.desc) : '한국문화정보원 등록 공식 영상 촬영지입니다.';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
+            <span style="background:var(--accent-subtle); color:var(--accent); font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px;">${escapeHtml(mediaTypeLabel(item.mediaType))}</span>
+            <span style="font-size:10px; color:var(--text-muted);">${escapeHtml(item.placeType || '촬영지')}</span>
+          </div>
+          <div style="font-size:15px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">${escapeHtml(item.title)}</div>
+          <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:6px;">
+            <i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.placeName)}
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">${escapeHtml(item.address || '주소 정보 없음')}</div>
+          <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">${escapeHtml(shortDesc)}</p>
+          <div style="display:flex; justify-content:flex-end; gap:6px; border-top:1px solid var(--border); padding-top:10px;">
+            <button class="btn btn-secondary" style="min-height:32px; padding:4px 10px; font-size:11px;" onclick="openCsvSceneDetail(${item.id})">
+              <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> 더 자세히 보기
+            </button>
+          </div>
+        `;
+        frag.appendChild(card);
+      });
+
+      grid.appendChild(frag);
+      koccaRenderedCount += nextBatch.length;
+
+      const remaining = koccaFilteredMatches.length - koccaRenderedCount;
+      if (loadMoreWrap && loadMoreBtn) {
+        if (remaining > 0) {
+          loadMoreWrap.style.display = 'block';
+          loadMoreBtn.innerText = `더 보기 (남은 ${remaining.toLocaleString()}건)`;
+        } else {
+          loadMoreWrap.style.display = 'none';
+        }
+      }
+    }
+
+    function openSceneDetailModal(detail) {
+      currentSceneDetailTarget = detail;
+      const imgEl = document.getElementById('sdm-still-img');
+      const phEl = document.getElementById('sdm-still-placeholder');
+      if (detail.stillUrl) {
+        imgEl.src = detail.stillUrl;
+        imgEl.style.display = 'block';
+        phEl.style.display = 'none';
+      } else {
+        imgEl.style.display = 'none';
+        phEl.style.display = 'block';
+      }
+
+      document.getElementById('sdm-media-badge').innerText = detail.mediaBadge || '드라마';
+      document.getElementById('sdm-ep-badge').innerText = detail.epBadge || '';
+      document.getElementById('sdm-ep-badge').style.display = detail.epBadge ? 'inline-block' : 'none';
+      document.getElementById('sdm-work-title').innerText = detail.title || '작품 정보';
+
+      const quoteEl = document.getElementById('sdm-quote');
+      if (detail.quote) {
+        quoteEl.innerText = `"${detail.quote}"`;
+        quoteEl.style.display = 'block';
+      } else {
+        quoteEl.style.display = 'none';
+      }
+
+      document.getElementById('sdm-scene-desc').innerText = detail.desc || '등록된 장면 설명이 없습니다.';
+      document.getElementById('sdm-cast').innerText = detail.cast || '등록된 출연진 정보가 없습니다. (작품 공식 출연진 정보 준비 중)';
+      document.getElementById('sdm-place-name').innerText = detail.placeName || '촬영지 정보 준비 중';
+      document.getElementById('sdm-place-addr').innerText = detail.address || '상세 주소 정보가 등록되지 않았습니다.';
+
+      const metaParts = [];
+      if (detail.hours && detail.hours !== '정보없음') metaParts.push(`영업시간: ${detail.hours}`);
+      if (detail.closed && detail.closed !== '정보없음') metaParts.push(`휴무일: ${detail.closed}`);
+      if (detail.phone && detail.phone !== '정보없음') metaParts.push(`연락처: ${detail.phone}`);
+      document.getElementById('sdm-place-meta').innerText = metaParts.join('  •  ');
+
+      document.getElementById('sdm-wardrobe').innerText = detail.wardrobe || '이 장면의 의상·소품 정보가 아직 등록되지 않았습니다. (유사 스타일 및 아이템 큐레이션 준비 중)';
+
+      const mapBtn = document.getElementById('sdm-map-btn');
+      if (mapBtn) {
+        mapBtn.style.display = (detail.lat && detail.lng) ? 'inline-flex' : 'none';
+      }
+
+      document.getElementById('scene-detail-modal').classList.add('active');
+    }
+
+    function openCsvSceneDetail(id) {
+      const item = koccaLocations.find(x => x.id === id);
+      if (!item) return;
+      openSceneDetailModal({
+        title: item.title,
+        mediaBadge: mediaTypeLabel(item.mediaType),
+        epBadge: item.placeType || '촬영지',
+        stillUrl: '',
+        quote: '',
+        desc: item.desc,
+        cast: item.cast ? `${item.cast} (장면 설명 기반 추출)` : '',
+        placeName: item.placeName,
+        address: item.address,
+        hours: item.hours,
+        closed: item.closed,
+        phone: item.phone,
+        lat: item.lat,
+        lng: item.lng,
+        wardrobe: CURATED_WARDROBE_MAP[item.title] || ''
+      });
+    }
+
+    function openExploreCardDetail(card) {
+      if (!card) return;
+      const work = card.dataset.work || '';
+      const quote = card.dataset.quote || '';
+      const ott = card.dataset.ott || '드라마';
+      const person = card.dataset.person || '';
+      const img = card.querySelector('.cinema-still-wrap img')?.getAttribute('src') || '';
+      const watermark = card.querySelector('.still-cut-watermark')?.innerText?.trim() || '';
+      const ep = card.querySelector('.cinema-still-wrap > div:last-child')?.innerText?.trim() || '';
+      const desc = card.querySelector('p')?.innerText?.trim() || '';
+      const placePart = watermark.includes('·') ? watermark.split('·').slice(1).join('·').trim() : watermark;
+
+      openSceneDetailModal({
+        title: work,
+        mediaBadge: ott,
+        epBadge: ep,
+        stillUrl: img,
+        quote: quote,
+        desc: desc,
+        cast: person,
+        placeName: placePart || `${work} 주요 촬영지`,
+        address: placePart ? `${placePart} 일대` : '작품 공식 촬영지 정보',
+        wardrobe: CURATED_WARDROBE_MAP[work] || '주연 배우 시그니처 시즌 아우터 및 데일리 캐주얼 스타일'
+      });
+    }
+
+    function initExploreCardDetails() {
+      const cards = document.querySelectorAll('#explore-cards-list .explore-item');
+      cards.forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('button')) return;
+          openExploreCardDetail(card);
+        });
+        const btnRow = card.querySelector('div[style*="border-top"] > div');
+        if (btnRow && !btnRow.querySelector('.btn-scene-detail')) {
+          const detailBtn = document.createElement('button');
+          detailBtn.className = 'btn btn-secondary btn-scene-detail';
+          detailBtn.style.cssText = 'min-height:34px; padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:4px;';
+          detailBtn.innerHTML = '<i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> 더 자세히 보기';
+          detailBtn.onclick = (e) => {
+            e.stopPropagation();
+            openExploreCardDetail(card);
+          };
+          btnRow.prepend(detailBtn);
+        }
+      });
+    }
+
+    function focusMapFromSceneDetail() {
+      const d = currentSceneDetailTarget;
+      if (!d) return;
+      closeModal('scene-detail-modal');
+      const mapTabBtn = document.querySelector('.tab-item[onclick*="map"]');
+      switchTab('map', mapTabBtn);
+      if (d.lat && d.lng) {
+        focusMapOnCsvLocation(d);
+      }
+    }
+
+    let mapCsvSearchTimer = null;
+    function onMapCsvSearch(val) {
+      clearTimeout(mapCsvSearchTimer);
+      mapCsvSearchTimer = setTimeout(() => {
+        const q = (val || '').trim().toLowerCase();
+        const listEl = document.getElementById('map-csv-quick-list');
+        if (!listEl) return;
+        if (!q || !koccaLoaded) {
+          listEl.style.display = 'none';
+          listEl.innerHTML = '';
+          return;
+        }
+        const matches = [];
+        for (let i = 0; i < koccaLocations.length && matches.length < 25; i++) {
+          if (koccaLocations[i]._search.includes(q)) {
+            matches.push(koccaLocations[i]);
+          }
+        }
+        listEl.style.display = 'block';
+        if (matches.length === 0) {
+          listEl.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--text-muted); text-align:center;">일치하는 촬영지가 없습니다.</div>';
+          return;
+        }
+        listEl.innerHTML = matches.map(m => `
+          <div onclick="focusMapOnCsvById(${m.id})" style="padding:8px 10px; border-bottom:1px solid var(--border-light); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div style="min-width:0;">
+              <div style="font-size:12px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(m.placeName)} <span style="color:var(--accent); font-weight:600;">(${escapeHtml(m.title)})</span></div>
+              <div style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(m.address || '')}</div>
+            </div>
+            <span style="font-size:10px; color:var(--accent); font-weight:700; white-space:nowrap;">위치 보기</span>
+          </div>
+        `).join('');
+      }, 120);
+    }
+
+    function focusMapOnCsvById(id) {
+      const item = koccaLocations.find(x => x.id === id);
+      if (item) focusMapOnCsvLocation(item);
+    }
+
+    function focusMapOnCsvLocation(item) {
+      const titleEl = document.getElementById('map-loc-title');
+      const addrEl = document.getElementById('map-loc-addr');
+      const descEl = document.getElementById('map-loc-desc');
+      const workEl = document.getElementById('map-work-badge');
+      const catEl = document.getElementById('map-category-badge');
+      if (titleEl) titleEl.innerText = item.placeName || item.title;
+      if (addrEl) addrEl.innerHTML = '<i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> ' + escapeHtml(item.address || '주소 정보 없음');
+      if (descEl) descEl.innerText = item.desc || '한국문화정보원 등록 공식 영상 촬영지입니다.';
+      if (workEl) workEl.innerText = item.title || '공식 촬영지';
+      if (catEl) {
+        catEl.innerText = '🎬 공공 DB 촬영지';
+        catEl.style.background = 'var(--accent)';
+      }
+
+      if (kakaoMapInstance && window.kakao && window.kakao.maps && item.lat && item.lng) {
+        const pos = new window.kakao.maps.LatLng(item.lat, item.lng);
+        koccaMapSearchMarkers.forEach(m => m.setMap(null));
+        koccaMapSearchMarkers = [];
+        const marker = new window.kakao.maps.Marker({ position: pos, title: item.placeName || item.title });
+        marker.setMap(kakaoMapInstance);
+        koccaMapSearchMarkers.push(marker);
+        kakaoMapInstance.setLevel(4);
+        kakaoMapInstance.panTo(pos);
+      }
+      triggerToast(`📍 [${item.placeName || item.title}] 위치로 이동했습니다.`);
     }
 
     // OTT 바로 보러가기 핸들러 (티빙 & 웨이브)
@@ -6218,6 +6662,8 @@
     // 페이지 로드 시 카카오맵 초기화 및 나이트모드 복원
     document.addEventListener('DOMContentLoaded', () => {
       initKakaoMap();
+      initExploreCardDetails();
+      loadKoccaLocations();
       if (localStorage.getItem('scenein_night_mode') === 'true') {
         document.body.classList.add('dark-mode');
         const nightToggle = document.getElementById('toggle-night-mode');
