@@ -35,7 +35,7 @@ export const ko = {
   explore: {
     headerTitle: '씬 렌즈',
     subtitle: '익명 공유 명장면 데이터베이스',
-    searchPlaceholder: '작품, 명대사, 배우 검색해보세요.',
+    searchPlaceholder: '작품명, 명대사, 배우, 감정 키워드를 검색해보세요.',
     anonymousNotice: '모든 명장면은 익명으로 안전하게 공유됩니다.',
     saveToMyDrawer: '씬 아카이브에 저장',
     scrapToDrawer: '씬 아카이브에 저장',
