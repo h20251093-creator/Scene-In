@@ -4859,10 +4859,56 @@
             <div id="sdm-place-meta" style="font-size:11.5px; color:var(--text-muted); line-height:1.5;"></div>
           </div>
 
-          <!-- 배우 착용 의상·소품 정보 -->
+          <!-- 배우 착용 의상·소품 정보 + AI 분석 -->
           <div style="border-top:1px solid var(--border-light); padding:14px 0 6px;">
-            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">배우 착용 의상·소품</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">배우 착용 의상·소품</div>
+              <button type="button" id="sdm-ai-analyze-btn" class="sl-btn-detail" style="padding:6px 12px; font-size:11px;"
+                onclick="analyzeCurrentSceneWithAI(false)">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent);"></i> AI로 정보 찾아보기
+              </button>
+            </div>
             <div id="sdm-wardrobe" style="font-size:13px; color:var(--text-secondary); line-height:1.6;"></div>
+
+            <!-- AI 분석 로딩 상태 -->
+            <div id="sdm-ai-loading" style="display:none; margin-top:14px; padding:14px; border-radius:12px; background:var(--bg-subtle); border:1px solid var(--border-light); align-items:center; gap:10px;">
+              <i class="fa-solid fa-spinner fa-spin" style="color:var(--accent); font-size:15px;"></i>
+              <span style="font-size:12.5px; font-weight:600; color:var(--text-secondary);">장면 속 의상과 배경 정보를 분석하고 있어요...</span>
+            </div>
+
+            <!-- AI 장면 분석 결과 (추정) -->
+            <div id="sdm-ai-result" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--border-light);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+                <div style="font-size:12px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent);"></i>
+                  <span>AI 장면 분석 결과 (추정)</span>
+                </div>
+                <button type="button" onclick="analyzeCurrentSceneWithAI(true)"
+                  style="background:transparent; border:none; padding:4px 6px; font-size:11px; font-weight:600; color:var(--accent); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-rotate-right"></i> 재분석
+                </button>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">착용 의상 & 스타일 분석</div>
+                <div id="sdm-ai-outfits" style="display:flex; flex-direction:column; gap:6px;"></div>
+                <div id="sdm-ai-mood" style="font-size:12px; color:var(--text-secondary); margin-top:6px; line-height:1.5;"></div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">비슷한 스타일 쇼핑 검색 키워드</div>
+                <div id="sdm-ai-keywords" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+              </div>
+
+              <div style="margin-bottom:10px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">장면 분위기 & 촬영 배경·소품 요약</div>
+                <div id="sdm-ai-atmosphere" style="font-size:12.5px; color:var(--text-primary); line-height:1.55;"></div>
+              </div>
+
+              <div style="font-size:11px; color:var(--text-muted); line-height:1.45;">
+                AI 분석 결과는 장면 이미지와 작품 정보를 바탕으로 추정한 스타일 가이드입니다.
+              </div>
+            </div>
           </div>
 
           <div style="display:flex; gap:8px; margin-top:14px;">
@@ -5864,7 +5910,228 @@
         mapBtn.style.display = (detail.lat && detail.lng) ? 'inline-flex' : 'none';
       }
 
+      restoreSceneAiPanel(detail);
       document.getElementById('scene-detail-modal').classList.add('active');
+    }
+
+    const AI_SCENE_CACHE_KEY = 'scenein_ai_scene_cache';
+    let sceneAiMemoryCache = null;
+
+    function getSceneAiCacheMap() {
+      if (sceneAiMemoryCache) return sceneAiMemoryCache;
+      try {
+        const raw = localStorage.getItem(AI_SCENE_CACHE_KEY);
+        sceneAiMemoryCache = raw ? JSON.parse(raw) : {};
+      } catch (_) {
+        sceneAiMemoryCache = {};
+      }
+      return sceneAiMemoryCache;
+    }
+
+    function getSceneAiCacheKey(detail) {
+      return [detail?.title || '', detail?.epBadge || '', detail?.placeName || '', (detail?.quote || '').slice(0, 30)].join('|');
+    }
+
+    function restoreSceneAiPanel(detail) {
+      const loadingEl = document.getElementById('sdm-ai-loading');
+      const resultEl = document.getElementById('sdm-ai-result');
+      const btnEl = document.getElementById('sdm-ai-analyze-btn');
+      if (loadingEl) loadingEl.style.display = 'none';
+
+      const cache = getSceneAiCacheMap();
+      const cached = cache[getSceneAiCacheKey(detail)];
+      if (cached) {
+        renderSceneAiAnalysis(cached);
+        if (btnEl) btnEl.style.display = 'none';
+      } else {
+        if (resultEl) resultEl.style.display = 'none';
+        if (btnEl) {
+          btnEl.style.display = 'inline-flex';
+          btnEl.disabled = false;
+        }
+      }
+    }
+
+    function buildClientSmartFallback(detail) {
+      const title = (detail.title || '작품').trim();
+      const cast = (detail.cast || '주연 배우').trim();
+      const place = (detail.placeName || '촬영지').trim();
+      const desc = (detail.desc || '').trim();
+      const wardrobe = (detail.wardrobe || '').trim();
+      const text = `${title} ${desc} ${wardrobe} ${place}`.toLowerCase();
+
+      const isWinter = text.includes('코트') || text.includes('목도리') || text.includes('눈') || text.includes('겨울') || text.includes('도깨비') || text.includes('설산');
+      const isBeach = text.includes('해변') || text.includes('바다') || text.includes('서핑') || text.includes('여름');
+      const isSuit = text.includes('수트') || text.includes('재킷') || text.includes('여왕') || text.includes('글로리');
+
+      let outfitItems;
+      let lookMood;
+      let shoppingKeywords;
+
+      if (isWinter) {
+        outfitItems = [
+          { category: '아우터', item: '오버핏 롱 울 캐시미어 코트', colorMaterial: '다크 차콜 / 헤비 울 블렌드' },
+          { category: '상의', item: '하프넥 립 니트 풀오버', colorMaterial: '아이보리·블랙 / 소프트 메리노 울' },
+          { category: '하의', item: '스트레이트 핏 울 슬랙스', colorMaterial: '딥 네이비 / 매트 트윌' },
+          { category: '잡화', item: '프린지 울 머플러 & 레더 크로스백', colorMaterial: '버건디·블랙 / 캐시미어·소가죽' }
+        ];
+        lookMood = '차분하고 서정적인 겨울 드라마 시그니처 롱코트 레이어드 무드';
+        shoppingKeywords = [`${title} 롱코트`, '캐시미어 오버핏 코트', '버건디 울 머플러', '겨울 드라마 코디'];
+      } else if (isSuit) {
+        outfitItems = [
+          { category: '아우터', item: '테일러드 싱글 브레스티드 재킷', colorMaterial: '네이비·아이보리 / 스트레치 수팅 울' },
+          { category: '상의', item: '실크 블라우스 또는 드레스 셔츠', colorMaterial: '크림 화이트 / 새틴·코튼 포플린' },
+          { category: '하의', item: '와이드 테일러드 팬츠', colorMaterial: '차콜·블랙 / 드레이프 울' },
+          { category: '잡화', item: '스트럭처드 레더 토트백 & 미니멀 이어링', colorMaterial: '블랙·골드 / 카프스킨' }
+        ];
+        lookMood = '도회적이고 세련된 하이엔드 테일러드 포멀 룩';
+        shoppingKeywords = [`${title} 착장`, '테일러드 롱 재킷', '미니멀 레더 토트백', '클래식 실크 블라우스'];
+      } else if (isBeach) {
+        outfitItems = [
+          { category: '상의', item: '루즈핏 린넨 오픈 칼라 셔츠', colorMaterial: '라이트 블루·화이트 / 내추럴 린넨' },
+          { category: '하의', item: '릴랙스드 코튼 치노 팬츠', colorMaterial: '샌드 베이지 / 워싱 코튼' },
+          { category: '잡화', item: '캔버스 에코백 & 틴트 선글라스', colorMaterial: '에크루 / 코튼 캔버스' }
+        ];
+        lookMood = '청량하고 내추럴한 해변·리조트 캐주얼 스타일';
+        shoppingKeywords = [`${title} 린넨셔츠`, '비치 캐주얼 코디', '샌드 베이지 치노팬츠', '여름 드라마 데일리룩'];
+      } else {
+        outfitItems = [
+          { category: '아우터', item: '미니멀 트러커 재킷 또는 가디건', colorMaterial: '베이지·카키 / 워싱 코튼 트윌' },
+          { category: '상의', item: '릴랙스드 핏 코튼 옥스포드 셔츠', colorMaterial: '오프화이트 / 코튼 100%' },
+          { category: '하의', item: '스트레이트 인디고 데님 팬츠', colorMaterial: '미드 블루 / 논페이드 데님' },
+          { category: '잡화', item: '빈티지 레더 워치 & 캔버스 숄더백', colorMaterial: '브라운·에크루 / 천연가죽' }
+        ];
+        lookMood = '일상 속 감성이 묻어나는 내추럴 빈티지 데일리 무드';
+        shoppingKeywords = [`${title} 패션`, `${cast.split(/[·,(]/)[0].trim()} 스타일`, '미니멀 코튼 재킷', '내추럴 데일리룩'];
+      }
+
+      return {
+        outfitItems,
+        lookMood,
+        shoppingKeywords: shoppingKeywords.filter(Boolean).slice(0, 4),
+        sceneAtmosphere: desc
+          ? `${place}의 공간감과 인물의 감정선이 자연스럽게 어우러지는 시네마틱 톤입니다.`
+          : `${title} 특유의 서정적인 색감과 ${place}의 현장 분위기가 돋보이는 장면입니다.`,
+        propsAndSpace: `${place}${detail.address ? ` (${detail.address})` : ''} 배경의 자연광·조명 대비와 계절감 소품이 장면의 몰입감을 높여줍니다.`
+      };
+    }
+
+    function captureStillDataUrlSafe(imgEl) {
+      try {
+        if (!imgEl || !imgEl.complete || !imgEl.naturalWidth || imgEl.style.display === 'none') return '';
+        const canvas = document.createElement('canvas');
+        const maxW = 480;
+        const scale = Math.min(1, maxW / imgEl.naturalWidth);
+        canvas.width = Math.round(imgEl.naturalWidth * scale);
+        canvas.height = Math.round(imgEl.naturalHeight * scale);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+        ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', 0.72);
+      } catch (_) {
+        return '';
+      }
+    }
+
+    async function analyzeCurrentSceneWithAI(forceRefresh) {
+      const detail = currentSceneDetailTarget;
+      if (!detail) return;
+      const cacheKey = getSceneAiCacheKey(detail);
+      const cache = getSceneAiCacheMap();
+
+      if (!forceRefresh && cache[cacheKey]) {
+        renderSceneAiAnalysis(cache[cacheKey]);
+        return;
+      }
+
+      const loadingEl = document.getElementById('sdm-ai-loading');
+      const resultEl = document.getElementById('sdm-ai-result');
+      const btnEl = document.getElementById('sdm-ai-analyze-btn');
+
+      if (btnEl) btnEl.style.display = 'none';
+      if (resultEl) resultEl.style.display = 'none';
+      if (loadingEl) loadingEl.style.display = 'flex';
+
+      const stillDataUrl = captureStillDataUrlSafe(document.getElementById('sdm-still-img'));
+      let analysis = null;
+
+      try {
+        const res = await fetch('/api/analyze-scene', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: detail.title,
+            epBadge: detail.epBadge,
+            quote: detail.quote,
+            desc: detail.desc,
+            cast: detail.cast,
+            placeName: detail.placeName,
+            address: detail.address,
+            wardrobe: detail.wardrobe,
+            stillUrl: detail.stillUrl,
+            stillDataUrl
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.analysis) analysis = data.analysis;
+        }
+      } catch (_) {
+        analysis = null;
+      }
+
+      if (!analysis) {
+        analysis = buildClientSmartFallback(detail);
+      }
+
+      cache[cacheKey] = analysis;
+      try {
+        localStorage.setItem(AI_SCENE_CACHE_KEY, JSON.stringify(cache));
+      } catch (_) {}
+
+      if (loadingEl) loadingEl.style.display = 'none';
+      renderSceneAiAnalysis(analysis);
+    }
+
+    function renderSceneAiAnalysis(analysis) {
+      const resultEl = document.getElementById('sdm-ai-result');
+      const outfitsEl = document.getElementById('sdm-ai-outfits');
+      const moodEl = document.getElementById('sdm-ai-mood');
+      const keywordsEl = document.getElementById('sdm-ai-keywords');
+      const atmoEl = document.getElementById('sdm-ai-atmosphere');
+      if (!resultEl || !analysis) return;
+
+      if (outfitsEl) {
+        outfitsEl.innerHTML = (analysis.outfitItems || []).map(o => `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; font-size:12.5px; line-height:1.5; padding:4px 0;">
+            <span style="font-weight:700; color:var(--text-primary); min-width:44px;">${escapeHtml(o.category)}</span>
+            <span style="flex:1; color:var(--text-primary);">${escapeHtml(o.item)} <span style="color:var(--text-muted); font-size:11.5px;">(${escapeHtml(o.colorMaterial)})</span></span>
+          </div>
+        `).join('');
+      }
+      if (moodEl) {
+        moodEl.innerText = analysis.lookMood ? `무드: ${analysis.lookMood}` : '';
+      }
+      if (keywordsEl) {
+        keywordsEl.innerHTML = (analysis.shoppingKeywords || []).map(kw => `
+          <button type="button" class="sl-tag-pill" style="border:1px solid var(--border); cursor:pointer; display:inline-flex; align-items:center; gap:4px;"
+            onclick="onAiKeywordClick('${escapeHtml(kw).replace(/'/g, "\\'")}')">
+            <i class="fa-solid fa-magnifying-glass" style="font-size:9px; color:var(--accent);"></i> ${escapeHtml(kw)}
+          </button>
+        `).join('');
+      }
+      if (atmoEl) {
+        atmoEl.innerText = [analysis.sceneAtmosphere, analysis.propsAndSpace].filter(Boolean).join(' ');
+      }
+
+      resultEl.style.display = 'block';
+    }
+
+    function onAiKeywordClick(kw) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(kw).catch(() => {});
+      }
+      triggerToast(`"${kw}" 키워드를 복사했습니다. 쇼핑 검색창에 붙여넣어 보세요!`);
     }
 
     function openCsvSceneDetail(id) {
