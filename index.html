@@ -1246,6 +1246,134 @@
       color: var(--text-secondary);
     }
 
+    /* Reference-style Minimal SceneLens Card */
+    .sl-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .sl-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+    }
+    .sl-card-media {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      background: var(--surface-high);
+      position: relative;
+    }
+    .sl-card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .sl-card-body {
+      padding: 20px 22px 22px;
+    }
+    .sl-card-title {
+      font-size: 21px;
+      font-weight: 800;
+      font-style: normal;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .sl-card-quote {
+      font-size: 13.5px;
+      font-weight: 400;
+      font-style: normal;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .sl-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .sl-tag-pill {
+      background: var(--surface-high);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .sl-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .sl-card-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sl-btn-detail {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sl-btn-detail:hover {
+      background: var(--surface-high);
+    }
+    .sl-btn-ott {
+      border-radius: 999px;
+      border: none;
+      background: var(--secondary);
+      color: var(--text-inverse);
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .sl-btn-ott:hover {
+      opacity: 0.9;
+    }
+    .sl-bookmark-btn {
+      background: transparent;
+      border: none;
+      padding: 6px;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .sl-bookmark-btn:active {
+      transform: scale(0.9);
+    }
+    .sl-bookmark-btn.is-saved {
+      color: var(--accent);
+    }
+
     /* Tab Panels */
     .tab-panel {
       display: none;
@@ -3362,10 +3490,10 @@
         <!-- Two Distinct Area Segment Toggle -->
         <div class="section-segment-toggle">
           <div class="section-segment-btn active" id="btn-seg-my" onclick="switchArchiveSection('my')">
-            <i class="fa-solid fa-user-pen"></i> 내가 기록한 장면 (<span id="my-records-count">6</span>)
+            <i class="fa-solid fa-user-pen"></i> 내가 기록한 장면
           </div>
           <div class="section-segment-btn" id="btn-seg-scraped" onclick="switchArchiveSection('scraped')">
-            <i class="fa-solid fa-bookmark"></i> 씬 렌즈 스크랩 (<span id="scraped-records-count">4</span>)
+            <i class="fa-solid fa-bookmark"></i> 씬 렌즈 스크랩
           </div>
         </div>
 
@@ -4014,18 +4142,13 @@
     <!-- INTERACTIVE MODALS                             -->
     <!-- ============================================== -->
 
-    <!-- 1. Spot Register Modal (1. 지도: 장소와 이름만 등록) -->
+    <!-- 1. Spot Register Modal (장소 등록 + 팝업 내 지도 연동 + 확장 작품 검색) -->
     <div class="modal-backdrop" id="register-spot-modal"
       onclick="if(event.target===this) closeModal('register-spot-modal')">
-      <div class="modal-dialog">
+      <div class="modal-dialog" style="max-width:560px; max-height:88vh; overflow-y:auto;">
         <div class="modal-head">
           <div class="title"><i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> 장소 등록</div>
           <i class="fa-solid fa-xmark modal-close" onclick="closeModal('register-spot-modal')"></i>
-        </div>
-
-        <div
-          style="background:rgba(233,139,38,0.08); border:1px solid rgba(233,139,38,0.2); padding:10px 14px; border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--text-secondary); line-height:16px;">
-          나만의 촬영지 또는 기억하고 싶은 <strong>장소와 이름만 등록</strong>해보세요.
         </div>
 
         <div style="margin-bottom:14px;">
@@ -4039,14 +4162,28 @@
         <div style="margin-bottom:14px;">
           <label
             style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">상세
-            위치 및 주소 *</label>
-          <input type="text" id="new-spot-address" placeholder="예: 서울 용산구 남산공원길 105"
-            style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+            위치 및 주소 * (지도에서 검색하거나 핀을 클릭하세요)</label>
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <input type="text" id="new-spot-address" placeholder="장소명 또는 주소 검색 (예: 영진해변, 서울 남산공원길)"
+              onkeydown="if(event.key==='Enter'){event.preventDefault(); searchRegisterSpotMap();}"
+              style="flex:1; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
+            <button type="button" class="btn btn-secondary" onclick="searchRegisterSpotMap()"
+              style="min-height:40px; padding:0 12px; font-size:12px; white-space:nowrap;">
+              <i class="fa-solid fa-magnifying-glass" style="color:var(--accent);"></i> 지도 검색
+            </button>
+          </div>
+          <div id="register-spot-map-results" style="display:none; max-height:130px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:8px;"></div>
+          <div id="register-spot-map" style="width:100%; height:190px; border-radius:12px; border:1px solid var(--border); background:var(--surface-high); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+            <span style="font-size:12px; color:var(--text-muted);">지도를 불러오는 중...</span>
+          </div>
+          <div id="register-spot-coord-hint" style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+            지도를 클릭하거나 검색 결과를 선택하면 주소와 좌표가 자동 입력됩니다.
+          </div>
         </div>
 
         <div style="margin-bottom:16px; position:relative;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">관련 작품 (OTT 연동 검색)</label>
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">관련 작품 (OTT · 공공 촬영지 DB 통합 검색)</label>
             <div style="display:flex; gap:4px; align-items:center;">
               <span
                 style="font-size:10px; background:#FF143C; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">TVING</span>
@@ -4056,7 +4193,7 @@
           </div>
           <div style="position:relative;">
             <input type="text" id="new-spot-work" oninput="searchSpotWork(this.value)"
-              onfocus="searchSpotWork(this.value)" placeholder="연동된 티빙·웨이브 작품명을 검색하세요 (예: 달빛, 시그널, 파도)"
+              onfocus="searchSpotWork(this.value)" placeholder="작품명을 검색하세요 (예: 도깨비, 사랑의 불시착, 나의 해방일지)"
               style="width:100%; background:var(--surface-high); border:1px solid var(--border); border-radius:8px; padding:10px 36px 10px 12px; color:var(--text-primary); font-size:13px; outline:none;" />
             <i class="fa-solid fa-magnifying-glass"
               style="position:absolute; right:12px; top:12px; color:var(--accent); font-size:13px;"></i>
@@ -4071,7 +4208,7 @@
           </div>
           <!-- 실시간 드롭다운 -->
           <div id="spot-work-dropdown"
-            style="display:none; position:absolute; left:0; right:0; top:66px; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-height:180px; overflow-y:auto; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.18);">
+            style="display:none; position:absolute; left:0; right:0; top:66px; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-height:190px; overflow-y:auto; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.18);">
           </div>
         </div>
 
@@ -4568,75 +4705,67 @@
       </div>
     </div>
 
-    <!-- 8. 씬 렌즈 장면 상세 정보 모달 -->
+    <!-- 8. 씬 렌즈 장면 상세 정보 모달 (레퍼런스 미니멀 디자인 통일) -->
     <div class="modal-backdrop" id="scene-detail-modal" onclick="if(event.target===this) closeModal('scene-detail-modal')">
-      <div class="modal-dialog" style="max-width:600px; max-height:88vh; overflow-y:auto;">
-        <div class="modal-head">
-          <div class="title" id="sdm-header-title">
-            <i class="fa-solid fa-clapperboard" style="color:var(--accent);"></i> 장면 상세 정보
-          </div>
-          <i class="fa-solid fa-xmark modal-close" onclick="closeModal('scene-detail-modal')"></i>
-        </div>
-
-        <!-- 스틸컷 또는 플레이스홀더 -->
-        <div id="sdm-still-wrap" style="height:190px; border-radius:12px; overflow:hidden; position:relative; margin-bottom:14px; background:var(--surface-high); display:flex; align-items:center; justify-content:center;">
-          <img id="sdm-still-img" src="" alt="장면 스틸컷" style="width:100%; height:100%; object-fit:cover; display:none;" />
-          <div id="sdm-still-placeholder" style="text-align:center; color:var(--text-muted); padding:16px;">
-            <i class="fa-solid fa-film" style="font-size:28px; color:var(--accent); margin-bottom:6px; display:block;"></i>
-            <span style="font-size:12px; font-weight:600;">장면 스틸컷 준비 중</span>
-          </div>
-          <span id="sdm-media-badge" style="position:absolute; top:10px; left:10px; background:var(--accent); color:#FFF; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px;">드라마</span>
-          <span id="sdm-ep-badge" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.72); color:#FFF; font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px;"></span>
-        </div>
-
-        <!-- 1. 장면 및 작품 기본 정보 -->
-        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
-          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
-            <i class="fa-solid fa-tv"></i> 장면 및 작품 기본 정보
-          </div>
-          <div id="sdm-work-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-bottom:4px;"></div>
-          <div id="sdm-quote" style="font-size:13px; font-style:italic; font-weight:600; color:var(--text-primary); margin-bottom:6px; display:none;"></div>
-          <div id="sdm-scene-desc" style="font-size:12px; color:var(--text-secondary); line-height:18px;"></div>
-        </div>
-
-        <!-- 2. 출연 배우진 정보 -->
-        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
-          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
-            <i class="fa-solid fa-user-group"></i> 출연 배우진 정보
-          </div>
-          <div id="sdm-cast" style="font-size:12px; color:var(--text-primary); line-height:18px;"></div>
-        </div>
-
-        <!-- 3. 촬영지 상세 정보 -->
-        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
-            <div style="font-size:11px; font-weight:700; color:var(--accent);">
-              <i class="fa-solid fa-location-dot"></i> 촬영지 상세 정보
+      <div class="modal-dialog" style="max-width:580px; max-height:88vh; overflow-y:auto; padding:0; border-radius:20px;">
+        <div style="position:relative;">
+          <div id="sdm-still-wrap" style="height:220px; overflow:hidden; background:var(--surface-high); display:flex; align-items:center; justify-content:center;">
+            <img id="sdm-still-img" src="" alt="장면 스틸컷" style="width:100%; height:100%; object-fit:cover; display:none;" />
+            <div id="sdm-still-placeholder" style="text-align:center; color:var(--text-muted); padding:16px;">
+              <i class="fa-solid fa-film" style="font-size:28px; color:var(--accent); margin-bottom:6px; display:block;"></i>
+              <span style="font-size:12px; font-weight:600;">장면 스틸컷 준비 중</span>
             </div>
-            <button type="button" class="btn btn-primary" id="sdm-go-map-btn"
-              style="min-height:28px; padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:4px;"
-              onclick="focusMapFromSceneDetail()">
-              <i class="fa-solid fa-map-location-dot"></i> 지도로 보러가기
-            </button>
           </div>
-          <div id="sdm-place-name" style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:2px;"></div>
-          <div id="sdm-place-addr" style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;"></div>
-          <div id="sdm-place-meta" style="font-size:11px; color:var(--text-muted); line-height:17px;"></div>
-        </div>
-
-        <!-- 4. 배우 착용 의상·소품 정보 -->
-        <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:14px;">
-          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
-            <i class="fa-solid fa-shirt"></i> 배우 착용 의상·소품 정보
-          </div>
-          <div id="sdm-wardrobe" style="font-size:12px; color:var(--text-secondary); line-height:18px;"></div>
-        </div>
-
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-primary" id="sdm-map-btn" style="flex:1; display:none;" onclick="focusMapFromSceneDetail()">
-            <i class="fa-solid fa-map-location-dot"></i> 지도에서 위치 보기
+          <button type="button" onclick="closeModal('scene-detail-modal')" aria-label="닫기"
+            style="position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:16px; border:none; background:rgba(0,0,0,0.55); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px;">
+            <i class="fa-solid fa-xmark"></i>
           </button>
-          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('scene-detail-modal')">닫기</button>
+        </div>
+
+        <div style="padding:22px 24px 24px;">
+          <!-- 작품 제목 & 명대사 (정체) & 메타 태그 -->
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+            <span id="sdm-media-badge" class="sl-tag-pill" style="background:var(--secondary); color:var(--text-inverse);">드라마</span>
+            <span id="sdm-ep-badge" class="sl-tag-pill"></span>
+          </div>
+          <div id="sdm-work-title" style="font-size:22px; font-weight:800; font-style:normal; color:var(--text-primary); line-height:1.3; margin-bottom:8px;"></div>
+          <div id="sdm-quote" style="font-size:14px; font-weight:400; font-style:normal; color:var(--text-secondary); line-height:1.55; margin-bottom:14px; display:none;"></div>
+
+          <!-- 장면 설명 -->
+          <div style="border-top:1px solid var(--border-light); padding:14px 0;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">장면 설명</div>
+            <div id="sdm-scene-desc" style="font-size:13px; color:var(--text-primary); line-height:1.6;"></div>
+          </div>
+
+          <!-- 출연 배우진 정보 -->
+          <div style="border-top:1px solid var(--border-light); padding:14px 0;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">출연 배우진</div>
+            <div id="sdm-cast" style="font-size:13px; color:var(--text-primary); line-height:1.6;"></div>
+          </div>
+
+          <!-- 촬영지 상세 정보 -->
+          <div style="border-top:1px solid var(--border-light); padding:14px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted);">촬영지 상세 정보</div>
+              <button type="button" class="sl-btn-ott" id="sdm-go-map-btn" style="padding:6px 12px; font-size:11px;"
+                onclick="focusMapFromSceneDetail()">
+                <i class="fa-solid fa-map-location-dot"></i> 지도로 보러가기
+              </button>
+            </div>
+            <div id="sdm-place-name" style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:3px;"></div>
+            <div id="sdm-place-addr" style="font-size:12.5px; color:var(--text-secondary); margin-bottom:4px;"></div>
+            <div id="sdm-place-meta" style="font-size:11.5px; color:var(--text-muted); line-height:1.5;"></div>
+          </div>
+
+          <!-- 배우 착용 의상·소품 정보 -->
+          <div style="border-top:1px solid var(--border-light); padding:14px 0 6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">배우 착용 의상·소품</div>
+            <div id="sdm-wardrobe" style="font-size:13px; color:var(--text-secondary); line-height:1.6;"></div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button class="sl-btn-detail" style="flex:1; justify-content:center; padding:10px 16px;" onclick="closeModal('scene-detail-modal')">닫기</button>
+          </div>
         </div>
       </div>
     </div>
@@ -4701,8 +4830,139 @@
       document.getElementById(id).classList.remove('active');
     }
 
+    let registerSpotMapInstance = null;
+    let registerSpotMarker = null;
+    let registerSpotCoords = null;
+
     function openRegisterSpotModal() {
       openModal('register-spot-modal');
+      setTimeout(initRegisterSpotMap, 80);
+    }
+
+    function initRegisterSpotMap() {
+      const container = document.getElementById('register-spot-map');
+      if (!container) return;
+
+      if (!(window.kakao && window.kakao.maps)) {
+        container.innerHTML = '<div style="padding:16px; text-align:center; font-size:12px; color:var(--text-muted);">카카오맵 로드 후 지도에서 직접 위치를 선택할 수 있습니다.<br/>위 검색창에서 촬영지/주소를 검색해보세요.</div>';
+        return;
+      }
+
+      if (!registerSpotMapInstance) {
+        container.innerHTML = '';
+        const center = new window.kakao.maps.LatLng(37.5539, 126.9798);
+        registerSpotMapInstance = new window.kakao.maps.Map(container, { center, level: 5 });
+        registerSpotMarker = new window.kakao.maps.Marker({ position: center });
+        registerSpotMarker.setMap(registerSpotMapInstance);
+
+        window.kakao.maps.event.addListener(registerSpotMapInstance, 'click', (mouseEvent) => {
+          const latlng = mouseEvent.latLng;
+          const lat = latlng.getLat();
+          const lng = latlng.getLng();
+          setRegisterSpotPin(lat, lng, '');
+          if (window.kakao.maps.services && window.kakao.maps.services.Geocoder) {
+            const geocoder = new window.kakao.maps.services.Geocoder();
+            geocoder.coord2Address(lng, lat, (result, status) => {
+              if (status === window.kakao.maps.services.Status.OK && result[0]) {
+                const road = result[0].road_address?.address_name;
+                const jibun = result[0].address?.address_name;
+                const addr = road || jibun || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                document.getElementById('new-spot-address').value = addr;
+              }
+            });
+          } else {
+            document.getElementById('new-spot-address').value = `위도 ${lat.toFixed(5)}, 경도 ${lng.toFixed(5)}`;
+          }
+        });
+      } else {
+        registerSpotMapInstance.relayout();
+      }
+    }
+
+    function setRegisterSpotPin(lat, lng, addrText, nameText) {
+      registerSpotCoords = { lat, lng };
+      const hintEl = document.getElementById('register-spot-coord-hint');
+      if (hintEl) {
+        hintEl.innerText = `선택된 좌표: ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}`;
+      }
+      if (addrText) {
+        document.getElementById('new-spot-address').value = addrText;
+      }
+      if (nameText && !document.getElementById('new-spot-name').value.trim()) {
+        document.getElementById('new-spot-name').value = nameText;
+      }
+      if (registerSpotMapInstance && window.kakao && window.kakao.maps) {
+        const pos = new window.kakao.maps.LatLng(lat, lng);
+        if (!registerSpotMarker) {
+          registerSpotMarker = new window.kakao.maps.Marker({ position: pos });
+          registerSpotMarker.setMap(registerSpotMapInstance);
+        } else {
+          registerSpotMarker.setPosition(pos);
+        }
+        registerSpotMapInstance.setLevel(4);
+        registerSpotMapInstance.panTo(pos);
+      }
+    }
+
+    function searchRegisterSpotMap() {
+      const q = (document.getElementById('new-spot-address')?.value || '').trim();
+      const resEl = document.getElementById('register-spot-map-results');
+      if (!q || !resEl) return;
+
+      const ql = q.toLowerCase();
+      const dbMatches = [];
+      if (koccaLoaded) {
+        for (let i = 0; i < koccaLocations.length && dbMatches.length < 10; i++) {
+          const item = koccaLocations[i];
+          if (item.lat && item.lng && item._search.includes(ql)) {
+            dbMatches.push(item);
+          }
+        }
+      }
+
+      if (dbMatches.length > 0) {
+        resEl.style.display = 'block';
+        resEl.innerHTML = dbMatches.map(m => `
+          <div onclick="selectRegisterSpotDb(${m.id})" style="padding:8px 10px; border-bottom:1px solid var(--border-light); cursor:pointer;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-primary);">${escapeHtml(m.placeName)} <span style="color:var(--accent); font-weight:600;">(${escapeHtml(m.title)})</span></div>
+            <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(m.address || '')}</div>
+          </div>
+        `).join('');
+        return;
+      }
+
+      if (window.kakao && window.kakao.maps && window.kakao.maps.services && window.kakao.maps.services.Places) {
+        const ps = new window.kakao.maps.services.Places();
+        ps.keywordSearch(q, (data, status) => {
+          if (status === window.kakao.maps.services.Status.OK && data.length > 0) {
+            resEl.style.display = 'block';
+            resEl.innerHTML = data.slice(0, 8).map((p, idx) => `
+              <div onclick="selectRegisterSpotPlace(${Number(p.y)}, ${Number(p.x)}, '${escapeHtml(p.road_address_name || p.address_name)}', '${escapeHtml(p.place_name)}')" style="padding:8px 10px; border-bottom:1px solid var(--border-light); cursor:pointer;">
+                <div style="font-size:12px; font-weight:700; color:var(--text-primary);">${escapeHtml(p.place_name)}</div>
+                <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(p.road_address_name || p.address_name)}</div>
+              </div>
+            `).join('');
+          } else {
+            resEl.style.display = 'block';
+            resEl.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--text-muted); text-align:center;">검색 결과가 없습니다. 지도를 직접 클릭해 위치를 지정할 수 있습니다.</div>';
+          }
+        });
+      } else {
+        resEl.style.display = 'block';
+        resEl.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--text-muted); text-align:center;">일치하는 촬영지 검색 결과가 없습니다.</div>';
+      }
+    }
+
+    function selectRegisterSpotDb(id) {
+      const item = koccaLocations.find(x => x.id === id);
+      if (!item) return;
+      document.getElementById('register-spot-map-results').style.display = 'none';
+      setRegisterSpotPin(item.lat, item.lng, item.address || item.placeName, item.placeName);
+    }
+
+    function selectRegisterSpotPlace(lat, lng, addr, name) {
+      document.getElementById('register-spot-map-results').style.display = 'none';
+      setRegisterSpotPin(lat, lng, addr, name);
     }
 
     function openAddCardModal() {
@@ -4760,6 +5020,19 @@
       document.getElementById('new-spot-name').value = '';
       document.getElementById('new-spot-address').value = '';
       document.getElementById('new-spot-work').value = '';
+      const selTag = document.getElementById('new-spot-selected-tag');
+      if (selTag) selTag.style.display = 'none';
+      const mapRes = document.getElementById('register-spot-map-results');
+      if (mapRes) mapRes.style.display = 'none';
+
+      if (registerSpotCoords && kakaoMapInstance && window.kakao && window.kakao.maps) {
+        const pos = new window.kakao.maps.LatLng(registerSpotCoords.lat, registerSpotCoords.lng);
+        const marker = new window.kakao.maps.Marker({ position: pos, title: name });
+        marker.setMap(kakaoMapInstance);
+        kakaoMarkers.push(marker);
+        kakaoMapInstance.panTo(pos);
+      }
+      registerSpotCoords = null;
 
       closeModal('register-spot-modal');
       triggerToast('🎉 새 장소가 지도에 등록되었습니다!');
@@ -5384,28 +5657,48 @@
 
       nextBatch.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card sl-card';
         card.style.cursor = 'pointer';
         card.onclick = (e) => {
           if (e.target.closest('button')) return;
           openCsvSceneDetail(item.id);
         };
         const shortDesc = item.desc ? (item.desc.length > 90 ? item.desc.slice(0, 90) + '...' : item.desc) : '한국문화정보원 등록 공식 영상 촬영지입니다.';
+        const sceneKey = `csv-${item.id}`;
+        const saved = isSceneBookmarked(sceneKey);
+        const tags = [
+          `#${(item.title || '').replace(/\s+/g, '')}`,
+          item.placeName ? `#${item.placeName.replace(/\s+/g, '')}` : '',
+          `#${mediaTypeLabel(item.mediaType)}`
+        ].filter(Boolean).slice(0, 4);
+
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:6px;">
-            <span style="background:var(--accent-subtle); color:var(--accent); font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px;">${escapeHtml(mediaTypeLabel(item.mediaType))}</span>
-            <span style="font-size:10px; color:var(--text-muted);">${escapeHtml(item.placeType || '촬영지')}</span>
+          <div class="sl-card-media" style="display:flex; align-items:center; justify-content:center;">
+            <div style="text-align:center; color:var(--text-muted); padding:16px;">
+              <i class="fa-solid fa-clapperboard" style="font-size:28px; color:var(--accent); margin-bottom:6px; display:block;"></i>
+              <span style="font-size:12px; font-weight:600;">${escapeHtml(item.placeName || '촬영지 정보')}</span>
+            </div>
           </div>
-          <div style="font-size:15px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">${escapeHtml(item.title)}</div>
-          <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:6px;">
-            <i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.placeName)}
-          </div>
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">${escapeHtml(item.address || '주소 정보 없음')}</div>
-          <p style="font-size:12px; color:var(--text-secondary); line-height:17px; margin-bottom:12px;">${escapeHtml(shortDesc)}</p>
-          <div style="display:flex; justify-content:flex-end; gap:6px; border-top:1px solid var(--border); padding-top:10px;">
-            <button class="btn btn-secondary" style="min-height:32px; padding:4px 10px; font-size:11px;" onclick="openCsvSceneDetail(${item.id})">
-              <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> 더 자세히 보기
-            </button>
+          <div class="sl-card-body">
+            <div class="sl-card-title">${escapeHtml(item.title)}</div>
+            <div class="sl-card-quote">${escapeHtml(shortDesc)}</div>
+            <div class="sl-card-tags">
+              ${tags.map(t => `<span class="sl-tag-pill">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="sl-card-actions">
+              <div class="sl-card-btn-group">
+                <button type="button" class="sl-btn-detail" onclick="openCsvSceneDetail(${item.id})">
+                  <i class="fa-solid fa-circle-info"></i> 상세 정보
+                </button>
+                <button type="button" class="sl-btn-ott" onclick="openCsvSceneDetail(${item.id})">
+                  <i class="fa-solid fa-location-dot"></i> 촬영지 보기
+                </button>
+              </div>
+              <button type="button" class="sl-bookmark-btn ${saved ? 'is-saved' : ''}" data-bookmark-key="${escapeHtml(sceneKey)}"
+                onclick="toggleCsvBookmark(${item.id}, this)" aria-label="스크랩 저장">
+                <i class="${saved ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
+              </button>
+            </div>
           </div>
         `;
         frag.appendChild(card);
@@ -5523,11 +5816,10 @@
       const quote = card.dataset.quote || '';
       const ott = card.dataset.ott || '드라마';
       const person = card.dataset.person || '';
-      const img = card.querySelector('.cinema-still-wrap img')?.getAttribute('src') || '';
-      const watermark = card.querySelector('.still-cut-watermark')?.innerText?.trim() || '';
-      const ep = card.querySelector('.cinema-still-wrap > div:last-child')?.innerText?.trim() || '';
-      const desc = card.querySelector('p')?.innerText?.trim() || '';
-      const placePart = watermark.includes('·') ? watermark.split('·').slice(1).join('·').trim() : watermark;
+      const img = card.dataset.still || card.querySelector('img')?.getAttribute('src') || '';
+      const placePart = card.dataset.place || '';
+      const ep = card.dataset.ep || '';
+      const desc = card.dataset.desc || '';
       const coordEntry = Object.entries(CURATED_PLACE_COORDS).find(([k]) => (placePart || '').includes(k))?.[1]
         || { lat: 37.5539, lng: 126.9798, address: placePart ? `${placePart} 일대` : '서울특별시 중구 남산공원길 일대' };
 
@@ -5548,25 +5840,95 @@
     }
 
     function initExploreCardDetails() {
+      loadScrapedScenesFromStorage();
       const cards = document.querySelectorAll('#explore-cards-list .explore-item');
-      cards.forEach(card => {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('button')) return;
-          openExploreCardDetail(card);
-        });
-        const btnRow = card.querySelector('div[style*="border-top"] > div');
-        if (btnRow && !btnRow.querySelector('.btn-scene-detail')) {
-          const detailBtn = document.createElement('button');
-          detailBtn.className = 'btn btn-secondary btn-scene-detail';
-          detailBtn.style.cssText = 'min-height:34px; padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:4px;';
-          detailBtn.innerHTML = '<i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> 더 자세히 보기';
-          detailBtn.onclick = (e) => {
-            e.stopPropagation();
-            openExploreCardDetail(card);
-          };
-          btnRow.prepend(detailBtn);
+      cards.forEach((card, idx) => {
+        const work = card.dataset.work || '';
+        const quote = card.dataset.quote || '';
+        const ott = card.dataset.ott || 'TVING';
+        const emotion = card.dataset.emotion || '여운 깊은';
+        const person = card.dataset.person || '';
+        const img = card.querySelector('.cinema-still-wrap img')?.getAttribute('src') || '';
+        const imgAlt = card.querySelector('.cinema-still-wrap img')?.getAttribute('alt') || work;
+        const watermark = card.querySelector('.still-cut-watermark')?.innerText?.trim() || '';
+        const ep = card.querySelector('.cinema-still-wrap > div:last-child')?.innerText?.trim() || '';
+        const desc = card.querySelector('p')?.innerText?.trim() || '';
+        const rawHashtags = card.querySelector('div[style*="border-top"] > span')?.innerText?.trim() || '';
+        const placePart = watermark.includes('·') ? watermark.split('·').slice(1).join('·').trim() : watermark;
+
+        card.dataset.still = img;
+        card.dataset.ep = ep;
+        card.dataset.desc = desc;
+        card.dataset.place = placePart;
+        const sceneKey = `curated-${idx}`;
+        card.dataset.sceneKey = sceneKey;
+
+        const tags = rawHashtags
+          ? rawHashtags.split(/\s+/).filter(t => t.startsWith('#')).slice(0, 4)
+          : [`#${work.replace(/\s+/g, '')}`, `#${emotion.replace(/\s+/g, '')}`];
+        if (placePart && tags.length < 4) {
+          const shortPlace = placePart.split('·')[0].trim().replace(/\s+/g, '');
+          if (shortPlace && !tags.includes(`#${shortPlace}`)) tags.push(`#${shortPlace}`);
         }
+
+        const saved = isSceneBookmarked(sceneKey);
+        const epParts = ep.split(' ');
+        const epNum = epParts[0] || '';
+        const tm = epParts[1] || '';
+
+        card.className = 'card explore-item sl-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+          <div class="sl-card-media">
+            <img src="${escapeHtml(img)}" alt="${escapeHtml(imgAlt)}" />
+          </div>
+          <div class="sl-card-body">
+            <div class="sl-card-title">${escapeHtml(work)}</div>
+            <div class="sl-card-quote">"${escapeHtml(quote)}"</div>
+            <div class="sl-card-tags">
+              ${tags.map(t => `<span class="sl-tag-pill">${escapeHtml(t)}</span>`).join('')}
+            </div>
+            <div class="sl-card-actions">
+              <div class="sl-card-btn-group">
+                <button type="button" class="sl-btn-detail" data-action="detail">
+                  <i class="fa-solid fa-circle-info"></i> 상세 정보
+                </button>
+                <button type="button" class="sl-btn-ott" data-action="ott">
+                  <i class="fa-solid fa-play"></i> ${escapeHtml(ott)} 바로보기
+                </button>
+              </div>
+              <button type="button" class="sl-bookmark-btn ${saved ? 'is-saved' : ''}" data-action="bookmark" data-bookmark-key="${escapeHtml(sceneKey)}" aria-label="스크랩 저장">
+                <i class="${saved ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        card.onclick = (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) {
+            openExploreCardDetail(card);
+            return;
+          }
+          const action = btn.dataset.action;
+          if (action === 'detail') {
+            openExploreCardDetail(card);
+          } else if (action === 'ott') {
+            openOttPlayback(ott, work, ep);
+          } else if (action === 'bookmark') {
+            toggleSceneBookmark({
+              key: sceneKey,
+              work,
+              quote,
+              stillUrl: img,
+              ep: epNum,
+              tm,
+              emotion,
+              character: person,
+              ott
+            }, btn);
+          }
+        };
       });
     }
 
@@ -5707,55 +6069,117 @@
       selectExploreFilterOpt('emotion', emotion, el);
     }
 
-    let scrapedCount = 1;
-    function scrapExploreScene(btn, work, quote, stillUrl, ep, tm, emotion, character) {
-      if (btn.classList.contains('scraped-done')) {
-        triggerToast('이미 내 서랍에 보관된 명장면입니다.');
-        return;
+    let scrapedScenesStore = [];
+    const SCRAPED_STORAGE_KEY = 'scenein_scraped_scenes';
+
+    function loadScrapedScenesFromStorage() {
+      try {
+        const raw = localStorage.getItem(SCRAPED_STORAGE_KEY);
+        scrapedScenesStore = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(scrapedScenesStore)) scrapedScenesStore = [];
+      } catch (_) {
+        scrapedScenesStore = [];
       }
+      renderScrapedArchiveList();
+    }
 
-      btn.classList.add('scraped-done');
-      btn.style.background = 'var(--surface-high)';
-      btn.style.color = 'var(--text-secondary)';
-      btn.style.border = '1px solid var(--border)';
-      btn.innerHTML = '<i class="fa-solid fa-check" style="color:var(--accent);"></i> 서랍에 보관됨';
+    function saveScrapedScenesToStorage() {
+      try {
+        localStorage.setItem(SCRAPED_STORAGE_KEY, JSON.stringify(scrapedScenesStore));
+      } catch (_) {}
+    }
 
-      // Clone into Tab 4 (서랍 - 탐색에서 스크랩한 장면)
-      scrapedCount++;
-      document.getElementById('scraped-records-count').innerText = scrapedCount;
+    function isSceneBookmarked(key) {
+      return scrapedScenesStore.some(s => s.key === key);
+    }
 
+    function syncExploreBookmarkIcons() {
+      document.querySelectorAll('[data-bookmark-key]').forEach(btn => {
+        const key = btn.getAttribute('data-bookmark-key');
+        const saved = isSceneBookmarked(key);
+        btn.classList.toggle('is-saved', saved);
+        btn.innerHTML = `<i class="${saved ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>`;
+      });
+    }
+
+    function toggleCsvBookmark(id, btn) {
+      const item = koccaLocations.find(x => x.id === id);
+      if (!item) return;
+      toggleSceneBookmark({
+        key: `csv-${id}`,
+        work: item.title,
+        quote: item.desc || item.placeName,
+        stillUrl: '',
+        ep: item.placeName || '',
+        tm: '',
+        emotion: mediaTypeLabel(item.mediaType),
+        character: item.cast || item.address || '',
+        ott: '공공DB'
+      }, btn);
+    }
+
+    function toggleSceneBookmark(sceneData, btn) {
+      const idx = scrapedScenesStore.findIndex(s => s.key === sceneData.key);
+      if (idx !== -1) {
+        scrapedScenesStore.splice(idx, 1);
+        saveScrapedScenesToStorage();
+        syncExploreBookmarkIcons();
+        renderScrapedArchiveList();
+        triggerToast('스크랩이 해제되었습니다.');
+      } else {
+        scrapedScenesStore.unshift(sceneData);
+        saveScrapedScenesToStorage();
+        syncExploreBookmarkIcons();
+        renderScrapedArchiveList();
+        triggerToast('씬 아카이브(스크랩)에 저장되었습니다.');
+      }
+    }
+
+    function removeScrapedByKey(key) {
+      scrapedScenesStore = scrapedScenesStore.filter(s => s.key !== key);
+      saveScrapedScenesToStorage();
+      syncExploreBookmarkIcons();
+      renderScrapedArchiveList();
+      triggerToast('스크랩이 삭제되었습니다.');
+    }
+
+    function renderScrapedArchiveList() {
       const scrapedList = document.getElementById('scraped-cards-list');
-      const cardHtml = `
-        <div class="card scraped-item" data-emotion="${emotion}" style="animation: slideUp 0.3s ease-out; border-left: 3px solid var(--accent);">
-          <div style="height:160px; border-radius:10px; overflow:hidden; position:relative; margin-bottom:12px;">
-            <img src="${stillUrl}" style="width:100%; height:100%; object-fit:cover;" />
-            <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
-              <span style="background:rgba(51,48,44,0.75); font-size:10px; color:#FFF; padding:2px 8px; border-radius:10px; font-weight:700;">${ep} ${tm}</span>
-              <span style="background:rgba(233,139,38,0.9); font-size:10px; color:#FFF; padding:2px 6px; border-radius:10px; font-weight:700;">스크랩됨</span>
-            </div>
-            <div style="position:absolute; top:8px; right:8px; background:rgba(233,139,38,0.9); color:#FFF; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">#${emotion}</div>
-          </div>
-          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px;">${work} • ${character}</div>
-          <div style="font-size:14px; font-weight:700; color:var(--accent); font-style:italic; margin-bottom:6px;">
-            "${quote}"
-          </div>
-          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:16px;">
-            [익명 탐색 아카이브 스크랩] 마음에 드는 장면으로 내 서랍에 추가 보관되었습니다.
+      if (!scrapedList) return;
+      scrapedList.querySelectorAll('[data-dynamic-scrap="true"]').forEach(el => el.remove());
+
+      const html = scrapedScenesStore.map(s => `
+        <div class="card scraped-item" data-dynamic-scrap="true" data-emotion="${escapeHtml(s.emotion || '')}" style="animation: slideUp 0.25s ease-out;">
+          ${s.stillUrl ? `
+          <div style="height:170px; border-radius:12px; overflow:hidden; margin-bottom:12px; background:var(--surface-high);">
+            <img src="${escapeHtml(s.stillUrl)}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          </div>` : ''}
+          <div style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">${escapeHtml(s.work)}</div>
+          <div style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">
+            "${escapeHtml(s.quote)}"
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px;">
-            <button class="btn btn-secondary" style="min-height:34px; padding:4px 10px; font-size:11px;" onclick="triggerToast('연동 OTT 앱에서 바로 재생합니다.')">
-              <i class="fa-solid fa-play" style="color:var(--accent);"></i> OTT에서 보기
+            <button class="sl-btn-ott" style="padding:6px 12px; font-size:11px;" onclick="openOttPlayback('${escapeHtml(s.ott || 'TVING')}', '${escapeHtml(s.work).replace(/'/g, "\\'")}', '${escapeHtml((s.ep || '') + ' ' + (s.tm || ''))}')">
+              <i class="fa-solid fa-play"></i> OTT에서 보기
             </button>
-            <div style="display:flex; gap:14px;">
-              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${work}', '${quote.replace(/'/g, "\\'")}')"></i>
-              <i class="fa-regular fa-trash-can" style="color:var(--error); cursor:pointer; font-size:16px;" onclick="this.closest('.card').remove(); triggerToast('스크랩이 삭제되었습니다.');"></i>
+            <div style="display:flex; gap:14px; align-items:center;">
+              <i class="fa-solid fa-share-nodes" style="color:var(--accent); cursor:pointer; font-size:16px;" onclick="openShareModal('${escapeHtml(s.work).replace(/'/g, "\\'")}', '${escapeHtml(s.quote).replace(/'/g, "\\'")}')"></i>
+              <i class="fa-solid fa-bookmark" style="color:var(--accent); cursor:pointer; font-size:18px;" title="스크랩 해제" onclick="removeScrapedByKey('${escapeHtml(s.key)}')"></i>
             </div>
           </div>
         </div>
-      `;
-      scrapedList.insertAdjacentHTML('afterbegin', cardHtml);
+      `).join('');
 
-      triggerToast('🎉 내 서랍(탐색 스크랩)에 저장되었습니다!');
+      if (html) {
+        scrapedList.insertAdjacentHTML('afterbegin', html);
+      }
+    }
+
+    function scrapExploreScene(btn, work, quote, stillUrl, ep, tm, emotion, character) {
+      toggleSceneBookmark({
+        key: `legacy-${work}-${ep}-${tm}`,
+        work, quote, stillUrl, ep, tm, emotion, character, ott: 'TVING'
+      }, btn);
     }
 
     // Drawer 2-Area Toggle (4. 서랍: 내가 기록한 장면 vs 탐색에서 스크랩한 장면)
@@ -6388,36 +6812,59 @@
       closeModal('add-card-modal');
     }
 
-    // 1. 장소 등록 모달 내 OTT 작품 검색 (TVING & Wavve)
+    // 1. 장소 등록 모달 내 OTT + 공공 촬영지 DB 통합 작품 검색
     function searchSpotWork(query) {
       const dropdown = document.getElementById('spot-work-dropdown');
       if (!dropdown) return;
       const q = (query || '').trim().toLowerCase();
-      const filtered = q === ''
+
+      const results = [];
+      const seenTitles = new Set();
+
+      const ottFiltered = q === ''
         ? OTT_WORKS_CATALOG
         : OTT_WORKS_CATALOG.filter(w => w.title.toLowerCase().includes(q) || w.ott.toLowerCase().includes(q) || w.genre.toLowerCase().includes(q));
 
-      if (filtered.length === 0) {
-        dropdown.innerHTML = `<div style="padding:12px; font-size:12px; color:var(--text-secondary); text-align:center;">일치하는 OTT 연동 작품이 없습니다.</div>`;
+      ottFiltered.forEach(item => {
+        if (!seenTitles.has(item.title)) {
+          seenTitles.add(item.title);
+          results.push({ title: item.title, sub: item.genre, badge: item.ott, badgeColor: item.ottColor });
+        }
+      });
+
+      if (q !== '' && koccaLoaded) {
+        for (let i = 0; i < koccaLocations.length && results.length < 25; i++) {
+          const loc = koccaLocations[i];
+          if (!loc.title || seenTitles.has(loc.title)) continue;
+          if (loc._search.includes(q)) {
+            seenTitles.add(loc.title);
+            results.push({
+              title: loc.title,
+              sub: `${loc.placeName || ''} • ${loc.address || ''}`.replace(/^ • | • $/g, ''),
+              badge: mediaTypeLabel(loc.mediaType),
+              badgeColor: 'var(--accent)'
+            });
+          }
+        }
+      }
+
+      if (results.length === 0) {
+        dropdown.innerHTML = `<div style="padding:12px; font-size:12px; color:var(--text-secondary); text-align:center;">일치하는 작품이 없습니다.</div>`;
         dropdown.style.display = 'block';
         return;
       }
 
-      let html = '';
-      filtered.forEach(item => {
-        html += `
-          <div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; justify-content:space-between; align-items:center;"
-               onmouseover="this.style.background='var(--surface-high)'" onmouseout="this.style.background='transparent'"
-               onclick="selectSpotWork('${item.title}', '${item.ott}', '${item.ottColor}')">
-            <div>
-              <div style="font-size:13px; font-weight:700; color:var(--text-primary);">${item.title}</div>
-              <div style="font-size:11px; color:var(--text-secondary);">${item.genre}</div>
-            </div>
-            <span style="font-size:10px; background:${item.ottColor}; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">${item.ott}</span>
+      dropdown.innerHTML = results.map(item => `
+        <div style="padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px;"
+             onmouseover="this.style.background='var(--surface-high)'" onmouseout="this.style.background='transparent'"
+             onclick="selectSpotWork('${escapeHtml(item.title).replace(/'/g, "\\'")}', '${escapeHtml(item.badge)}', '${item.badgeColor}')">
+          <div style="min-width:0;">
+            <div style="font-size:13px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.title)}</div>
+            <div style="font-size:11px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.sub)}</div>
           </div>
-        `;
-      });
-      dropdown.innerHTML = html;
+          <span style="font-size:10px; background:${item.badgeColor}; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700; flex-shrink:0;">${escapeHtml(item.badge)}</span>
+        </div>
+      `).join('');
       dropdown.style.display = 'block';
     }
 
@@ -6493,7 +6940,8 @@
 
       cardsContainer.insertAdjacentHTML('afterbegin', cardHtml);
       totalMyArchiveCount++;
-      document.getElementById('my-records-count').innerText = totalMyArchiveCount;
+      const myCountEl = document.getElementById('my-records-count');
+      if (myCountEl) myCountEl.innerText = totalMyArchiveCount;
       const profCount = document.getElementById('prof-saved-count');
       if (profCount) profCount.innerText = totalMyArchiveCount;
 
@@ -6687,7 +7135,7 @@
 
       const script = document.createElement('script');
       script.type = 'text/javascript';
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${encodeURIComponent(key)}`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&libraries=services&appkey=${encodeURIComponent(key)}`;
       script.async = true;
       script.onload = () => {
         if (window.kakao && window.kakao.maps) {

@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.async = true;
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${encodeURIComponent(kakaoKey)}`;
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&libraries=services&appkey=${encodeURIComponent(kakaoKey)}`;
         script.onload = () => {
           if (win.kakao?.maps?.load) {
             win.kakao.maps.load(triggerMapInit);
