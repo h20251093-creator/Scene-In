@@ -51,7 +51,13 @@ export const KakaoMapView: React.FC<KakaoMapViewProps> = ({
   const [loadError, setLoadError] = useState<MapErrorType | null>(null);
   const [retryTick, setRetryTick] = useState<number>(0);
 
-  const kakaoApiKey = process.env.EXPO_PUBLIC_KAKAO_MAP_KEY?.trim() ?? '';
+  const kakaoApiKey = (
+    process.env.EXPO_PUBLIC_KAKAO_MAP_KEY ||
+    (typeof window !== 'undefined' &&
+      ((window as any).__ENV__?.KAKAO_MAP_KEY ||
+        (window as any).EXPO_PUBLIC_KAKAO_MAP_KEY)) ||
+    ''
+  ).trim();
   const isKeyConfigured =
     kakaoApiKey.length > 0 &&
     !kakaoApiKey.includes('여기에_자바스크립트_키_입력');

@@ -1,41 +1,50 @@
-// Expose Kakao Map API key to the global window object for index.html checks.
+// Expose Kakao Map API key to window and dynamically load Kakao Maps SDK.
 if (typeof window !== 'undefined') {
-  // Expo will replace the placeholder with the actual value at build time.
-  const kakaoKey = process.env.EXPO_PUBLIC_KAKAO_MAP_KEY ?? '';
-  // Direct key for scripts that look for this variable.
-  (window as any).EXPO_PUBLIC_KAKAO_MAP_KEY = kakaoKey;
-  // Some legacy checks use __ENV__.KAKAO_MAP_KEY.
-  (window as any).__ENV__ = (window as any).__ENV__ || {};
-  (window as any).__ENV__.KAKAO_MAP_KEY = kakaoKey;
-  // If the HTML side has set a retry hook, invoke it now.
-  (window as any).__retryInitKakaoMap?.();
-  // Also try direct init in case retry hook not set yet.
-  (window as any).initKakaoMap?.();
+  const kakaoKey = (process.env.EXPO_PUBLIC_KAKAO_MAP_KEY ?? '').trim();
+  const win = window as any;
+
+  win.EXPO_PUBLIC_KAKAO_MAP_KEY = kakaoKey;
+  win.__ENV__ = win.__ENV__ || {};
+  win.__ENV__.KAKAO_MAP_KEY = kakaoKey;
+
+  const triggerMapInit = () => {
+    if (typeof win.__retryInitKakaoMap === 'function') {
+      win.__retryInitKakaoMap();
+    } else if (typeof win.initKakaoMap === 'function') {
+      win.initKakaoMap();
+    } else if (typeof win.buildKakaoMap === 'function') {
+      win.buildKakaoMap();
+    }
+  };
+
+  if (kakaoKey && typeof document !== 'undefined') {
+    if (win.kakao?.maps?.load) {
+      win.kakao.maps.load(triggerMapInit);
+    } else {
+      const existingScript = document.querySelector(
+        'script[src*="dapi.kakao.com/v2/maps/sdk.js"]'
+      ) as HTMLScriptElement | null;
+
+      if (existingScript) {
+        existingScript.addEventListener('load', () => {
+          if (win.kakao?.maps?.load) {
+            win.kakao.maps.load(triggerMapInit);
+          }
+        });
+      } else {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${encodeURIComponent(kakaoKey)}`;
+        script.onload = () => {
+          if (win.kakao?.maps?.load) {
+            win.kakao.maps.load(triggerMapInit);
+          }
+        };
+        document.head.appendChild(script);
+      }
+    }
+  } else {
+    triggerMapInit();
+  }
 }
-
-
-// Expose Kakao Map API key to the global window object for index.html checks.
-if (typeof window !== 'undefined') {
-  // Expo will replace the placeholder with the actual value at build time.
-  const kakaoKey = process.env.EXPO_PUBLIC_KAKAO_MAP_KEY ?? '';
-  // Direct key for scripts that look for this variable.
-  (window as any).EXPO_PUBLIC_KAKAO_MAP_KEY = kakaoKey;
-  // Some legacy checks use __ENV__.KAKAO_MAP_KEY.
-  (window as any).__ENV__ = (window as any).__ENV__ || {};
-  (window as any).__ENV__.KAKAO_MAP_KEY = kakaoKey;
-  // If the HTML side has set a retry hook, invoke it now.
-  (window as any).__retryInitKakaoMap?.();
-}
-
-
-// Expose Kakao Map API key to the global window object for index.html checks.
-if (typeof window !== 'undefined') {
-  // Expo will replace the placeholder with the actual value at build time.
-  const kakaoKey = process.env.EXPO_PUBLIC_KAKAO_MAP_KEY ?? '';
-  // Direct key for scripts that look for this variable.
-  (window as any).EXPO_PUBLIC_KAKAO_MAP_KEY = kakaoKey;
-  // Some legacy checks use __ENV__.KAKAO_MAP_KEY.
-  (window as any).__ENV__ = (window as any).__ENV__ || {};
-  (window as any).__ENV__.KAKAO_MAP_KEY = kakaoKey;
-}
-
