@@ -2272,6 +2272,10 @@
             <input type="text" id="map-csv-search-input" oninput="onMapCsvSearch(this.value)"
               placeholder="작품명, 촬영지명, 지역 주소로 15,034개 촬영지 검색..."
               style="flex:1; border:none; background:transparent; font-size:12px; color:var(--text-primary); outline:none; min-height:36px;" />
+            <button type="button" id="map-csv-clear-btn" onclick="clearMapCsvSearch()" aria-label="검색어 초기화"
+              style="display:none; width:24px; height:24px; border-radius:12px; border:none; background:var(--surface-high); color:var(--text-secondary); cursor:pointer; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
             <span id="map-csv-count" style="font-size:11px; color:var(--text-muted); white-space:nowrap;">DB 로딩 중...</span>
           </div>
           <div id="map-csv-quick-list" style="display:none; margin-top:8px; max-height:170px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:6px;"></div>
@@ -4605,8 +4609,15 @@
 
         <!-- 3. 촬영지 상세 정보 -->
         <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px;">
-          <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">
-            <i class="fa-solid fa-location-dot"></i> 촬영지 상세 정보
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+            <div style="font-size:11px; font-weight:700; color:var(--accent);">
+              <i class="fa-solid fa-location-dot"></i> 촬영지 상세 정보
+            </div>
+            <button type="button" class="btn btn-primary" id="sdm-go-map-btn"
+              style="min-height:28px; padding:4px 10px; font-size:11px; display:inline-flex; align-items:center; gap:4px;"
+              onclick="focusMapFromSceneDetail()">
+              <i class="fa-solid fa-map-location-dot"></i> 지도로 보러가기
+            </button>
           </div>
           <div id="sdm-place-name" style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:2px;"></div>
           <div id="sdm-place-addr" style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;"></div>
@@ -4654,8 +4665,14 @@
         if (typeof kakaoMapInstance !== 'undefined' && kakaoMapInstance) {
           setTimeout(() => {
             kakaoMapInstance.relayout();
-            kakaoMapInstance.setCenter(new window.kakao.maps.LatLng(37.5539, 126.9798));
-          }, 50);
+            if (typeof activeMapFocusTarget !== 'undefined' && activeMapFocusTarget && activeMapFocusTarget.lat && activeMapFocusTarget.lng) {
+              const targetPos = new window.kakao.maps.LatLng(activeMapFocusTarget.lat, activeMapFocusTarget.lng);
+              kakaoMapInstance.setLevel(4);
+              kakaoMapInstance.setCenter(targetPos);
+            } else {
+              kakaoMapInstance.setCenter(new window.kakao.maps.LatLng(37.5539, 126.9798));
+            }
+          }, 60);
         } else if (typeof initKakaoMap === 'function') {
           initKakaoMap();
         }
@@ -5477,6 +5494,29 @@
       });
     }
 
+    const CURATED_PLACE_COORDS = {
+      '영진해변 방사제': { lat: 37.8758, lng: 128.8439, address: '강원도 강릉시 연곡면 영진리 해안로 1609' },
+      '덕수궁 돌담길': { lat: 37.5658, lng: 126.9751, address: '서울특별시 중구 정동길 46 (덕수궁 돌담길)' },
+      '덕수궁 돌담길 · 안성 팜랜드': { lat: 37.5658, lng: 126.9751, address: '서울특별시 중구 정동길 46' },
+      '연천': { lat: 38.0965, lng: 127.0749, address: '경기도 연천군 청산면 궁평리 일대' },
+      '강릉': { lat: 37.7519, lng: 128.8761, address: '강원도 강릉시 해안로 일대' },
+      '영월 봉래산': { lat: 37.1869, lng: 128.4876, address: '강원도 영월군 영월읍 봉래산로 일대' }
+    };
+
+    let activeMapFocusTarget = null;
+    let activeMapInfoWindow = null;
+
+    function clearDynamicMapMarkers() {
+      if (activeMapInfoWindow) {
+        activeMapInfoWindow.close();
+        activeMapInfoWindow = null;
+      }
+      if (Array.isArray(koccaMapSearchMarkers) && koccaMapSearchMarkers.length > 0) {
+        koccaMapSearchMarkers.forEach(m => m.setMap(null));
+        koccaMapSearchMarkers = [];
+      }
+    }
+
     function openExploreCardDetail(card) {
       if (!card) return;
       const work = card.dataset.work || '';
@@ -5488,6 +5528,8 @@
       const ep = card.querySelector('.cinema-still-wrap > div:last-child')?.innerText?.trim() || '';
       const desc = card.querySelector('p')?.innerText?.trim() || '';
       const placePart = watermark.includes('·') ? watermark.split('·').slice(1).join('·').trim() : watermark;
+      const coordEntry = Object.entries(CURATED_PLACE_COORDS).find(([k]) => (placePart || '').includes(k))?.[1]
+        || { lat: 37.5539, lng: 126.9798, address: placePart ? `${placePart} 일대` : '서울특별시 중구 남산공원길 일대' };
 
       openSceneDetailModal({
         title: work,
@@ -5498,7 +5540,9 @@
         desc: desc,
         cast: person,
         placeName: placePart || `${work} 주요 촬영지`,
-        address: placePart ? `${placePart} 일대` : '작품 공식 촬영지 정보',
+        address: coordEntry.address,
+        lat: coordEntry.lat,
+        lng: coordEntry.lng,
         wardrobe: CURATED_WARDROBE_MAP[work] || '주연 배우 시그니처 시즌 아우터 및 데일리 캐주얼 스타일'
       });
     }
@@ -5529,19 +5573,24 @@
     function focusMapFromSceneDetail() {
       const d = currentSceneDetailTarget;
       if (!d) return;
+      activeMapFocusTarget = { ...d };
       closeModal('scene-detail-modal');
       const mapTabBtn = document.querySelector('.tab-item[onclick*="map"]');
       switchTab('map', mapTabBtn);
-      if (d.lat && d.lng) {
-        focusMapOnCsvLocation(d);
-      }
+      focusMapOnCsvLocation(d);
     }
 
     let mapCsvSearchTimer = null;
     function onMapCsvSearch(val) {
+      const raw = (val || '').trim();
+      const clearBtn = document.getElementById('map-csv-clear-btn');
+      if (clearBtn) {
+        clearBtn.style.display = raw.length > 0 ? 'inline-flex' : 'none';
+      }
+
       clearTimeout(mapCsvSearchTimer);
       mapCsvSearchTimer = setTimeout(() => {
-        const q = (val || '').trim().toLowerCase();
+        const q = raw.toLowerCase();
         const listEl = document.getElementById('map-csv-quick-list');
         if (!listEl) return;
         if (!q || !koccaLoaded) {
@@ -5572,35 +5621,77 @@
       }, 120);
     }
 
+    function clearMapCsvSearch() {
+      clearTimeout(mapCsvSearchTimer);
+      const inputEl = document.getElementById('map-csv-search-input');
+      const clearBtn = document.getElementById('map-csv-clear-btn');
+      const listEl = document.getElementById('map-csv-quick-list');
+      if (inputEl) inputEl.value = '';
+      if (clearBtn) clearBtn.style.display = 'none';
+      if (listEl) {
+        listEl.style.display = 'none';
+        listEl.innerHTML = '';
+      }
+      activeMapFocusTarget = null;
+      clearDynamicMapMarkers();
+      if (kakaoMapInstance && window.kakao && window.kakao.maps) {
+        kakaoMapInstance.setLevel(6);
+        kakaoMapInstance.panTo(new window.kakao.maps.LatLng(37.5539, 126.9798));
+      }
+    }
+
     function focusMapOnCsvById(id) {
       const item = koccaLocations.find(x => x.id === id);
-      if (item) focusMapOnCsvLocation(item);
+      if (item) {
+        const listEl = document.getElementById('map-csv-quick-list');
+        if (listEl) listEl.style.display = 'none';
+        focusMapOnCsvLocation(item);
+      }
     }
 
     function focusMapOnCsvLocation(item) {
+      activeMapFocusTarget = item;
       const titleEl = document.getElementById('map-loc-title');
       const addrEl = document.getElementById('map-loc-addr');
       const descEl = document.getElementById('map-loc-desc');
       const workEl = document.getElementById('map-work-badge');
       const catEl = document.getElementById('map-category-badge');
+      const stillEl = document.getElementById('map-still-img');
       if (titleEl) titleEl.innerText = item.placeName || item.title;
       if (addrEl) addrEl.innerHTML = '<i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> ' + escapeHtml(item.address || '주소 정보 없음');
       if (descEl) descEl.innerText = item.desc || '한국문화정보원 등록 공식 영상 촬영지입니다.';
       if (workEl) workEl.innerText = item.title || '공식 촬영지';
       if (catEl) {
-        catEl.innerText = '🎬 공공 DB 촬영지';
+        catEl.innerText = '🎬 공식 촬영지';
         catEl.style.background = 'var(--accent)';
+      }
+      if (stillEl && item.stillUrl) {
+        stillEl.src = item.stillUrl;
       }
 
       if (kakaoMapInstance && window.kakao && window.kakao.maps && item.lat && item.lng) {
+        clearDynamicMapMarkers();
         const pos = new window.kakao.maps.LatLng(item.lat, item.lng);
-        koccaMapSearchMarkers.forEach(m => m.setMap(null));
-        koccaMapSearchMarkers = [];
-        const marker = new window.kakao.maps.Marker({ position: pos, title: item.placeName || item.title });
+        const marker = new window.kakao.maps.Marker({
+          position: pos,
+          title: item.placeName || item.title
+        });
         marker.setMap(kakaoMapInstance);
         koccaMapSearchMarkers.push(marker);
-        kakaoMapInstance.setLevel(4);
-        kakaoMapInstance.panTo(pos);
+
+        const infoHtml = `<div style="padding:8px 10px; min-width:170px; max-width:240px; font-family:Pretendard,sans-serif; color:#33302C;">
+          <div style="font-size:11px; font-weight:700; color:#E98B26; margin-bottom:2px;">${escapeHtml(item.title || '공식 촬영지')}</div>
+          <div style="font-size:12px; font-weight:800; margin-bottom:2px;">${escapeHtml(item.placeName || '')}</div>
+          <div style="font-size:10px; color:#6E675F;">${escapeHtml(item.address || '')}</div>
+        </div>`;
+        activeMapInfoWindow = new window.kakao.maps.InfoWindow({ content: infoHtml, removable: true });
+        activeMapInfoWindow.open(kakaoMapInstance, marker);
+
+        setTimeout(() => {
+          kakaoMapInstance.relayout();
+          kakaoMapInstance.setLevel(4);
+          kakaoMapInstance.panTo(pos);
+        }, 60);
       }
       triggerToast(`📍 [${item.placeName || item.title}] 위치로 이동했습니다.`);
     }
@@ -6614,6 +6705,8 @@
       if (!mapContainer) return;
 
       mapContainer.style.display = 'block';
+      const radarOverlay = document.getElementById('radar-map-overlay');
+      if (radarOverlay) radarOverlay.style.display = 'none';
       const statusPill = document.getElementById('kakao-map-status-pill');
       const statusText = document.getElementById('kakao-map-status-text');
       if (statusText) statusText.innerText = 'Kakao Maps 실시간 지도';
@@ -6629,6 +6722,7 @@
       // 마커 등록
       kakaoMarkers.forEach(m => m.setMap(null));
       kakaoMarkers = [];
+      clearDynamicMapMarkers();
 
       mapLocations.forEach((loc, idx) => {
         const markerPosition = new window.kakao.maps.LatLng(loc.lat, loc.lng);
@@ -6646,6 +6740,10 @@
 
         kakaoMarkers.push(marker);
       });
+
+      if (activeMapFocusTarget && activeMapFocusTarget.lat && activeMapFocusTarget.lng) {
+        focusMapOnCsvLocation(activeMapFocusTarget);
+      }
 
       console.info('[KakaoMap] 카카오맵이 성공적으로 활성화되었습니다.');
     }
@@ -6674,6 +6772,8 @@
 
     // 지도 핀 선택 핸들러
     function selectMapPin(index, el) {
+      activeMapFocusTarget = null;
+      clearDynamicMapMarkers();
       document.querySelectorAll('.pin-marker').forEach(p => p.classList.remove('active'));
       if (el) {
         el.classList.add('active');
